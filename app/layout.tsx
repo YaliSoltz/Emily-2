@@ -22,18 +22,24 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Emily Tal — Textile Design Portfolio',
+  title: { default: 'Emily Tal — Textile Design Portfolio', template: '%s — Emily Tal' },
   description: 'Portfolio of Emily Tal — textile design, knitting, and screen printing.',
   openGraph: {
     title: 'Emily Tal — Textile Design Portfolio',
     description: 'Portfolio of Emily Tal — textile design, knitting, and screen printing.',
     type: 'website',
+    locale: 'he_IL',
+    alternateLocale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Emily Tal — Textile Design Portfolio',
     description: 'Portfolio of Emily Tal — textile design, knitting, and screen printing.',
   },
+  alternates: {
+    languages: { 'he': '/', 'en': '/' },
+  },
+  keywords: ['Emily Tal', 'textile design', 'עיצוב טקסטיל', 'portfolio', 'knitting', 'screen printing'],
 }
 
 export default function RootLayout({

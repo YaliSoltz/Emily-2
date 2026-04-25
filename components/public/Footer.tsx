@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { Mail, Phone } from 'lucide-react'
 
 interface FooterProps {

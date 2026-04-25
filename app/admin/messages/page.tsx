@@ -28,12 +28,15 @@ export default function AdminMessagesPage() {
   }
 
   useEffect(() => {
-    load()
-    const supabase = createClient()
-    const channel = supabase.channel('messages-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, load)
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
+    void (async () => {
+      const supabase = createClient()
+      const { data } = await supabase.from('messages').select('*').order('submitted_at', { ascending: false })
+      setMessages(data ?? [])
+      setLoading(false)
+      supabase.channel('messages-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, load)
+        .subscribe()
+    })()
   }, [])
 
   const toggleRead = async (id: string, current: boolean) => {

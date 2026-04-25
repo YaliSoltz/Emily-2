@@ -42,7 +42,14 @@ export default function AdminGalleryPage() {
     setLoading(false)
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    void (async () => {
+      const supabase = createClient()
+      const { data } = await supabase.from('gallery_items').select('*').eq('language', 'he').order('order_index')
+      setItems(data ?? [])
+      setLoading(false)
+    })()
+  }, [])
 
   const openAdd = () => {
     setEditing({ ...empty, order_index: items.length } as GalleryItem)

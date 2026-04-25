@@ -14,7 +14,7 @@ export function AdminField({ label, children, hint }: AdminFieldProps) {
   )
 }
 
-interface AdminInputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+type AdminInputProps = React.InputHTMLAttributes<HTMLInputElement>
 export function AdminInput(props: AdminInputProps) {
   return (
     <input
@@ -24,7 +24,7 @@ export function AdminInput(props: AdminInputProps) {
   )
 }
 
-interface AdminTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+type AdminTextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>
 export function AdminTextarea(props: AdminTextareaProps) {
   return (
     <textarea

@@ -1,0 +1,39 @@
+'use client'
+
+import { LangProvider, useLang } from './LangProvider'
+import Header from './Header'
+import Footer from './Footer'
+import WhatsAppButton from './WhatsAppButton'
+import ScrollToTop from './ScrollToTop'
+
+interface Props {
+  children: React.ReactNode
+  contactInfo: { phone: string | null; email: string | null } | null
+  socialLinks: { platform: string; url: string }[]
+}
+
+function ShellInner({ children, contactInfo, socialLinks }: Props) {
+  const { lang, setLang } = useLang()
+
+  return (
+    <>
+      <Header lang={lang} onLangChange={setLang} />
+      <main className="flex-1 pt-16">
+        {children}
+      </main>
+      <Footer lang={lang} contactInfo={contactInfo} socialLinks={socialLinks} />
+      <WhatsAppButton />
+      <ScrollToTop />
+    </>
+  )
+}
+
+export default function PublicShell({ children, contactInfo, socialLinks }: Props) {
+  return (
+    <LangProvider>
+      <ShellInner contactInfo={contactInfo} socialLinks={socialLinks}>
+        {children}
+      </ShellInner>
+    </LangProvider>
+  )
+}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { X } from 'lucide-react'
 import { useLang } from './LangProvider'
@@ -29,6 +29,11 @@ export default function GalleryClient({ items }: GalleryClientProps) {
   const { lang } = useLang()
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [lightboxItem, setLightboxItem] = useState<GalleryItem | null>(null)
+
+  useEffect(() => {
+    document.body.style.overflow = lightboxItem ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [lightboxItem])
 
   // Deduplicate by id, prefer current lang
   const deduped = Object.values(

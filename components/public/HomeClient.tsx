@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import NavLink from './NavLink'
 import Image from 'next/image'
 import { useLang } from './LangProvider'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
@@ -40,14 +40,14 @@ export default function HomeClient({ heContent, enContent, galleryPreview }: Hom
               ? 'עיצוב טקסטיל · סריגה · הדפסי רשת'
               : 'Textile Design · Knitting · Screen Printing')}
           </p>
-          <Link
+          <NavLink
             href="/gallery"
             onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
             className="inline-flex items-center gap-3 bg-[#5C3D2E] text-[#F5F0E8] px-8 py-3.5 text-xs tracking-[0.2em] uppercase hover:bg-[#3D2519] transition-colors duration-200"
           >
             {c.hero_cta ?? (lang === 'he' ? 'צפייה בעבודות' : 'View Work')}
             <ArrowIcon size={14} />
-          </Link>
+          </NavLink>
         </div>
 
         {/* Decorative lines */}
@@ -76,7 +76,7 @@ export default function HomeClient({ heContent, enContent, galleryPreview }: Hom
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {galleryPreview.map(item => (
-                <Link key={item.id} href="/gallery" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
+                <NavLink key={item.id} href="/gallery" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
                   <div className="aspect-square bg-[#E8E0D5] overflow-hidden group relative">
                     {item.image_url ? (
                       <Image
@@ -92,18 +92,18 @@ export default function HomeClient({ heContent, enContent, galleryPreview }: Hom
                     )}
                     <div className="absolute inset-0 bg-[#3D2519]/0 group-hover:bg-[#3D2519]/20 transition-colors duration-300" />
                   </div>
-                </Link>
+                </NavLink>
               ))}
             </div>
             <div className="text-center mt-10">
-              <Link
+              <NavLink
                 href="/gallery"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
                 className="inline-flex items-center gap-2 text-sm text-[#5C3D2E] border-b border-[#5C3D2E]/40 pb-0.5 hover:border-[#5C3D2E] transition-colors tracking-widest uppercase"
               >
                 {lang === 'he' ? 'לכל העבודות' : 'View All Works'}
                 <ArrowIcon size={12} />
-              </Link>
+              </NavLink>
             </div>
           </div>
         </section>
@@ -120,14 +120,14 @@ export default function HomeClient({ heContent, enContent, galleryPreview }: Hom
               ? 'אשמח לשמוע על הפרויקט שלכם'
               : "I'd love to hear about your project"}
           </p>
-          <Link
+          <NavLink
             href="/contact"
             onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
             className="inline-flex items-center gap-3 border border-[#F5F0E8]/60 text-[#F5F0E8] px-8 py-3.5 text-xs tracking-[0.2em] uppercase hover:bg-[#F5F0E8] hover:text-[#5C3D2E] transition-colors duration-200"
           >
             {lang === 'he' ? 'יצירת קשר' : 'Get in Touch'}
             <ArrowIcon size={14} />
-          </Link>
+          </NavLink>
         </div>
       </section>
     </div>

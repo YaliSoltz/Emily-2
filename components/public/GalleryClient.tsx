@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
-import { X } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useLang } from './LangProvider'
 
 interface GalleryItem {
@@ -19,6 +19,138 @@ const categoryLabels: Record<string, { he: string; en: string }> = {
   textile: { he: 'עיצוב טקסטיל', en: 'Textile Design' },
   knitting: { he: 'סריגה', en: 'Knitting' },
   'screen-printing': { he: 'הדפסי רשת', en: 'Screen Printing' },
+}
+
+interface LightboxProps {
+  item: GalleryItem
+  items: GalleryItem[]
+  onClose: () => void
+  onNavigate: (item: GalleryItem) => void
+  categoryLabel: (cat: string) => string
+}
+
+function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxProps) {
+  const idx = items.findIndex(i => i.id === item.id)
+  const hasPrev = idx > 0
+  const hasNext = idx < items.length - 1
+
+  const prev = useCallback(() => { if (hasPrev) onNavigate(items[idx - 1]) }, [idx, items, hasPrev, onNavigate])
+  const next = useCallback(() => { if (hasNext) onNavigate(items[idx + 1]) }, [idx, items, hasNext, onNavigate])
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowLeft') next()
+      if (e.key === 'ArrowRight') prev()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose, prev, next])
+
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+      onClick={onClose}
+    >
+      {/* Close */}
+      <button
+        onClick={onClose}
+        className="absolute top-5 right-5 text-white/50 hover:text-white transition-colors p-2 z-10"
+        aria-label="Close"
+      >
+        <X size={22} />
+      </button>
+
+      {/* Counter */}
+      <span className="absolute top-6 left-6 text-white/30 text-xs tracking-widest">
+        {idx + 1} / {items.length}
+      </span>
+
+      {/* Prev */}
+      {hasPrev && (
+        <button
+          onClick={e => { e.stopPropagation(); prev() }}
+          className="absolute left-4 text-white/40 hover:text-white transition-colors p-3 z-10"
+          aria-label="Previous"
+        >
+          <ChevronLeft size={28} />
+        </button>
+      )}
+
+      {/* Next */}
+      {hasNext && (
+        <button
+          onClick={e => { e.stopPropagation(); next() }}
+          className="absolute right-4 text-white/40 hover:text-white transition-colors p-3 z-10"
+          aria-label="Next"
+        >
+          <ChevronRight size={28} />
+        </button>
+      )}
+
+      {/* Panel */}
+      <div
+        className="flex flex-col md:flex-row w-full max-w-5xl max-h-[90vh] mx-12 shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Image */}
+        <div className="relative flex-1 min-h-[50vh] md:min-h-0 bg-[#1a1a1a]">
+          {item.image_url ? (
+            <Image
+              src={item.image_url}
+              alt={item.title}
+              fill
+              className="object-contain"
+              sizes="(max-width: 768px) 100vw, 65vw"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <span className="text-white/20 text-xs tracking-widest uppercase">{item.title}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Info panel */}
+        <div className="w-full md:w-72 bg-[#FAF7F2] flex flex-col justify-between p-8 shrink-0">
+          <div>
+            {item.category && (
+              <span className="text-xs tracking-[0.25em] uppercase text-[#5C3D2E]/40 block mb-4">
+                {categoryLabel(item.category)}
+              </span>
+            )}
+            <h3 className="font-[family-name:var(--font-cormorant)] text-2xl font-light text-[#3D2519] leading-snug mb-4">
+              {item.title}
+            </h3>
+            {item.description && (
+              <p className="text-[#5C3D2E]/60 text-sm leading-relaxed">
+                {item.description}
+              </p>
+            )}
+          </div>
+
+          {/* Nav buttons */}
+          {items.length > 1 && (
+            <div className="flex gap-3 mt-8">
+              <button
+                onClick={prev}
+                disabled={!hasPrev}
+                className="flex-1 border border-[#5C3D2E]/20 py-2 text-xs tracking-widest uppercase text-[#5C3D2E]/50 hover:border-[#5C3D2E] hover:text-[#5C3D2E] transition-colors disabled:opacity-20 disabled:cursor-default"
+              >
+                ←
+              </button>
+              <button
+                onClick={next}
+                disabled={!hasNext}
+                className="flex-1 border border-[#5C3D2E]/20 py-2 text-xs tracking-widest uppercase text-[#5C3D2E]/50 hover:border-[#5C3D2E] hover:text-[#5C3D2E] transition-colors disabled:opacity-20 disabled:cursor-default"
+              >
+                →
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
 }
 
 interface GalleryClientProps {
@@ -121,46 +253,13 @@ export default function GalleryClient({ items }: GalleryClientProps) {
 
       {/* Lightbox */}
       {lightboxItem && (
-        <div
-          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
-          onClick={() => setLightboxItem(null)}
-        >
-          <button
-            className="absolute top-6 right-6 text-white/70 hover:text-white p-2"
-            onClick={() => setLightboxItem(null)}
-            aria-label="Close"
-          >
-            <X size={24} />
-          </button>
-          <div
-            className="max-w-3xl w-full max-h-[90vh] bg-[#FAF7F2] overflow-hidden rounded-sm shadow-2xl"
-            onClick={e => e.stopPropagation()}
-          >
-            {lightboxItem.image_url && (
-              <div className="relative aspect-[4/3] w-full">
-                <Image
-                  src={lightboxItem.image_url}
-                  alt={lightboxItem.title}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            )}
-            <div className="p-6">
-              <h3 className="font-[family-name:var(--font-cormorant)] text-xl text-[#3D2519] mb-2">
-                {lightboxItem.title}
-              </h3>
-              {lightboxItem.description && (
-                <p className="text-[#5C3D2E]/70 text-sm leading-relaxed">{lightboxItem.description}</p>
-              )}
-              {lightboxItem.category && (
-                <span className="inline-block mt-3 text-xs tracking-widest uppercase text-[#5C3D2E]/40">
-                  {categoryLabel(lightboxItem.category)}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
+        <Lightbox
+          item={lightboxItem}
+          items={filtered}
+          onClose={() => setLightboxItem(null)}
+          onNavigate={setLightboxItem}
+          categoryLabel={categoryLabel}
+        />
       )}
     </div>
   )

@@ -192,29 +192,47 @@ export default function GalleryClient({ items }: GalleryClientProps) {
             {lang === 'he' ? 'עבודות יתווספו בקרוב' : 'Works coming soon'}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {filtered.map(item => (
               <button
                 key={item.id}
                 onClick={() => setLightboxItem(item)}
-                className="group relative aspect-square bg-[#E8E0D5] overflow-hidden text-start"
+                className="group text-start bg-white border border-[#5C3D2E]/8 hover:border-[#5C3D2E]/20 hover:shadow-md transition-all duration-300"
               >
-                {item.image_url ? (
-                  <Image
-                    src={item.image_url}
-                    alt={item.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-[#5C3D2E]/20 text-xs tracking-widest uppercase">
-                      {categoryLabel(item.category ?? '')}
+                {/* Image */}
+                <div className="relative aspect-[4/3] bg-[#E8E0D5] overflow-hidden">
+                  {item.image_url ? (
+                    <Image
+                      src={item.image_url}
+                      alt={item.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-[#5C3D2E]/20 text-xs tracking-widest uppercase">
+                        {categoryLabel(item.category ?? '')}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="p-4">
+                  {item.category && (
+                    <span className="text-[10px] tracking-[0.2em] uppercase text-[#5C3D2E]/40 block mb-1.5">
+                      {categoryLabel(item.category)}
                     </span>
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-[#3D2519]/0 group-hover:bg-[#3D2519]/40 transition-colors duration-300 flex items-end p-4 opacity-0 group-hover:opacity-100">
-                  <span className="text-[#F5F0E8] text-sm font-light tracking-wide">{item.title}</span>
+                  )}
+                  <h3 className="font-[family-name:var(--font-cormorant)] text-lg font-light text-[#3D2519] leading-snug mb-2">
+                    {item.title}
+                  </h3>
+                  {item.description && (
+                    <p className="text-[#5C3D2E]/55 text-xs leading-relaxed line-clamp-2">
+                      {item.description}
+                    </p>
+                  )}
                 </div>
               </button>
             ))}

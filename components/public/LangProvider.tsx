@@ -18,9 +18,9 @@ export function LangProvider({ children, initialLang = 'he' }: { children: React
   }, [lang])
 
   const setLang = (l: Lang) => {
-    setLangState(l)
     localStorage.setItem('lang', l)
     document.cookie = `lang=${l}; path=/; max-age=31536000; SameSite=Lax`
+    window.location.reload()
   }
 
   return (

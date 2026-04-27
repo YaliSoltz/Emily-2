@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { Heebo, Cormorant_Garamond, Inter } from 'next/font/google'
+import { Suspense } from 'react'
+import NavigationProgress from '@/components/public/NavigationProgress'
 import './globals.css'
 
 const heebo = Heebo({
@@ -54,6 +56,9 @@ export default function RootLayout({
       className={`${heebo.variable} ${cormorant.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#FAF7F2] text-[#3D2519]">
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         {children}
       </body>
     </html>

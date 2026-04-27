@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import NavLink from './NavLink'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
@@ -68,7 +68,7 @@ export default function Header({ lang, onLangChange }: HeaderProps) {
     >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
+        <NavLink href="/" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
           <Image
             src="/images/logo.svg"
             alt="Emily Tal"
@@ -77,12 +77,12 @@ export default function Header({ lang, onLangChange }: HeaderProps) {
             priority
             className="h-10 w-auto"
           />
-        </Link>
+        </NavLink>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8">
           {links.map(link => (
-            <Link
+            <NavLink
               key={link.href}
               href={link.href}
               onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
@@ -93,7 +93,7 @@ export default function Header({ lang, onLangChange }: HeaderProps) {
               }`}
             >
               {link.label}
-            </Link>
+            </NavLink>
           ))}
 
           {/* Language switcher */}
@@ -130,7 +130,7 @@ export default function Header({ lang, onLangChange }: HeaderProps) {
             </div>
             <nav className="flex flex-col gap-1 p-6">
               {links.map(link => (
-                <Link
+                <NavLink
                   key={link.href}
                   href={link.href}
                   onClick={() => {
@@ -142,7 +142,7 @@ export default function Header({ lang, onLangChange }: HeaderProps) {
                   }`}
                 >
                   {link.label}
-                </Link>
+                </NavLink>
               ))}
               <button
                 onClick={() => {

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import type { Metadata } from 'next'
 import GalleryClient from '@/components/public/GalleryClient'
 
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export const revalidate = 3600
 
 export default async function GalleryPage() {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
 
   const { data: items } = await supabase
     .from('gallery_items')

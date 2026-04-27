@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import type { Metadata } from 'next'
 import AboutClient from '@/components/public/AboutClient'
 
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export const revalidate = 3600
 
 export default async function AboutPage() {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
 
   const [{ data: heContent }, { data: enContent }] = await Promise.all([
     supabase.from('pages').select('content_json, images_json').eq('page_name', 'about').eq('language', 'he').single(),

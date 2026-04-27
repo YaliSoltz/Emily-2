@@ -2,6 +2,15 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
+  const pathname = request.nextUrl.pathname
+  const isAdminRoute = pathname.startsWith('/admin/') || pathname === '/admin'
+  const isLoginPage = pathname === '/adminlogin'
+
+  // Skip auth check entirely for public routes
+  if (!isAdminRoute && !isLoginPage) {
+    return NextResponse.next({ request })
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -26,9 +35,6 @@ export async function updateSession(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
-
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin/') || request.nextUrl.pathname === '/admin'
-  const isLoginPage = request.nextUrl.pathname === '/adminlogin'
 
   if (isAdminRoute && !user) {
     const url = request.nextUrl.clone()

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import type { Metadata } from 'next'
 import ContactClient from '@/components/public/ContactClient'
 
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export const revalidate = 3600
 
 export default async function ContactPage() {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
 
   const [{ data: heContent }, { data: enContent }, { data: contactInfo }, { data: socialLinks }] =
     await Promise.all([

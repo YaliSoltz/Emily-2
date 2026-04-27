@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useLang } from './LangProvider'
 import { Mail, Phone } from 'lucide-react'
+import Link from 'next/link'
 
 interface ContactClientProps {
   heContent: Record<string, string>
@@ -114,8 +115,14 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
                 />
               </div>
               {status === 'error' && (
-                <p className="text-red-600 text-xs">{errorMsg}</p>
+                <p role="alert" className="text-red-600 text-xs">{errorMsg}</p>
               )}
+              <p className="text-[10px] text-[#5C3D2E]/40 leading-relaxed">
+                {lang === 'he'
+                  ? <>פרטיך ישמשו אך ורק למענה לפנייתך ויישמרו עד 24 חודשים. <Link href="/privacy" className="underline hover:text-[#5C3D2E]/70 transition-colors">מדיניות פרטיות</Link></>
+                  : <>Your details will be used solely to respond to your inquiry and retained for up to 24 months. <Link href="/privacy" className="underline hover:text-[#5C3D2E]/70 transition-colors">Privacy Policy</Link></>
+                }
+              </p>
               <button
                 type="submit"
                 disabled={status === 'loading'}

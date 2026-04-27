@@ -6,7 +6,12 @@
       "Bash(git commit *)",
       "Bash(git push *)",
       "Bash(npm run *)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(curl -s -L \"https://www.web-a.co.il/page-sitemap.xml\")",
+      "Bash(curl -s -L \"https://www.web-a.co.il/terms/\")",
+      "Bash(curl -s -L \"https://www.web-a.co.il/%d7%a9%d7%99%d7%9e%d7%95%d7%a9-%d7%91%d7%a2%d7%95%d7%92%d7%99%d7%95%d7%aa-cookies/\")",
+      "Bash(curl -s -L \"https://www.web-a.co.il/\")",
+      "Bash(curl -s -L \"https://www.web-a.co.il/%d7%9e%d7%93%d7%99%d7%a0%d7%99%d7%95%d7%aa-%d7%a4%d7%a8%d7%98%d7%99%d7%95%d7%aa/\")"
     ]
   }
 }

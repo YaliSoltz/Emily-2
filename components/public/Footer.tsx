@@ -1,4 +1,5 @@
 import { Mail, Phone } from 'lucide-react'
+import Link from 'next/link'
 
 interface FooterProps {
   lang: 'he' | 'en'
@@ -7,8 +8,8 @@ interface FooterProps {
 }
 
 const text = {
-  he: { rights: 'כל הזכויות שמורות', design: 'עיצוב טקסטיל, סריגה, הדפסי רשת' },
-  en: { rights: 'All rights reserved', design: 'Textile Design, Knitting, Screen Printing' },
+  he: { rights: 'כל הזכויות שמורות', design: 'עיצוב טקסטיל, סריגה, הדפסי רשת', terms: 'תקנון ותנאי שימוש' },
+  en: { rights: 'All rights reserved', design: 'Textile Design, Knitting, Screen Printing', terms: 'Terms of Use' },
 }
 
 export default function Footer({ lang, contactInfo, socialLinks }: FooterProps) {
@@ -65,10 +66,16 @@ export default function Footer({ lang, contactInfo, socialLinks }: FooterProps) 
           </div>
         </div>
 
-        <div className="border-t border-[#F5F0E8]/10 mt-8 pt-6 text-center">
+        <div className="border-t border-[#F5F0E8]/10 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-[#F5F0E8]/40 tracking-wider">
             © {new Date().getFullYear()} Emily Tal — {t.rights}
           </p>
+          <Link
+            href="/terms"
+            className="text-xs text-[#F5F0E8]/30 hover:text-[#F5F0E8]/60 tracking-wider transition-colors"
+          >
+            {t.terms}
+          </Link>
         </div>
       </div>
     </footer>

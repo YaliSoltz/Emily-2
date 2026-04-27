@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   description: 'מעצבת טקסטיל — סריגה, עיצוב טקסטיל והדפסי רשת',
 }
 
+export const revalidate = 3600
+
 export default async function AboutPage() {
   const supabase = await createClient()
 

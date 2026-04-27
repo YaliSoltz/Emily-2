@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import PublicShell from '@/components/public/PublicShell'
 
+export const revalidate = 3600
+
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
 

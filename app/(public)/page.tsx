@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   alternates: { languages: { he: '/', en: '/' } },
 }
 
+export const revalidate = 3600
+
 export default async function HomePage() {
   const supabase = await createClient()
 

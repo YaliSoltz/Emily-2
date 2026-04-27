@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   description: 'צרו קשר עם אמילי טל לשיתופי פעולה',
 }
 
+export const revalidate = 3600
+
 export default async function ContactPage() {
   const supabase = await createClient()
 

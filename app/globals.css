@@ -43,6 +43,11 @@ body {
   animation: fadeInUp 0.6s ease-out forwards;
 }
 
+/* Pointer cursor on all interactive elements */
+a, button, [role="button"], label[for], select, summary {
+  cursor: pointer;
+}
+
 /* Smooth image transitions */
 img {
   transition: opacity 0.3s ease;

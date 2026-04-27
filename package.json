@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node -e \"const {execSync}=require('child_process');try{console.log('\\n  commit: '+execSync('git rev-parse --short HEAD').toString().trim()+'\\n')}catch(e){}\" && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

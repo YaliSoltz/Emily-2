@@ -48,6 +48,11 @@ a, button, [role="button"], label[for], select, summary {
   cursor: pointer;
 }
 
+/* Links are only clickable on their text, not surrounding space */
+a {
+  display: inline;
+}
+
 /* Smooth image transitions */
 img {
   transition: opacity 0.3s ease;

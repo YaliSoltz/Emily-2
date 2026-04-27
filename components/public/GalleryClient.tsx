@@ -48,61 +48,45 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
   }, [onClose, prev, next])
 
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
-      onClick={onClose}
-    >
-      {/* Close */}
-      <button
-        onClick={onClose}
-        className="absolute top-5 right-5 text-white/50 hover:text-white transition-colors p-2 z-10"
-        aria-label="Close"
-      >
-        <X size={22} />
-      </button>
+    <div className="fixed inset-0 z-50 bg-black flex flex-col" onClick={onClose}>
 
-      {/* Counter */}
-      <span className="absolute top-6 left-6 text-white/30 text-xs tracking-widest">
-        {idx + 1} / {items.length}
-      </span>
-
-      {/* Prev */}
-      {hasPrev && (
+      {/* Top bar */}
+      <div className="flex items-center justify-between px-6 py-4 shrink-0" onClick={e => e.stopPropagation()}>
+        <span className="text-white/25 text-xs tracking-[0.2em] font-light">
+          {String(idx + 1).padStart(2, '0')} / {String(items.length).padStart(2, '0')}
+        </span>
         <button
-          onClick={e => { e.stopPropagation(); prev() }}
-          className="absolute left-4 text-white/40 hover:text-white transition-colors p-3 z-10"
-          aria-label="Previous"
+          onClick={onClose}
+          className="text-white/40 hover:text-white transition-colors duration-200 p-1"
+          aria-label="Close"
         >
-          <ChevronLeft size={28} />
+          <X size={20} strokeWidth={1.5} />
         </button>
-      )}
+      </div>
 
-      {/* Next */}
-      {hasNext && (
-        <button
-          onClick={e => { e.stopPropagation(); next() }}
-          className="absolute right-4 text-white/40 hover:text-white transition-colors p-3 z-10"
-          aria-label="Next"
+      {/* Image area */}
+      <div className="flex-1 flex items-center justify-center px-16 min-h-0 relative">
+        {hasPrev && (
+          <button
+            onClick={e => { e.stopPropagation(); prev() }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/80 transition-colors duration-200 p-2"
+            aria-label="Previous"
+          >
+            <ChevronLeft size={32} strokeWidth={1} />
+          </button>
+        )}
+
+        <div
+          className="relative w-full h-full"
+          onClick={e => e.stopPropagation()}
         >
-          <ChevronRight size={28} />
-        </button>
-      )}
-
-      {/* Panel */}
-      <div
-        className="flex flex-col md:flex-row w-full max-w-5xl mx-12 shadow-2xl"
-        style={{ height: 'min(90vh, 700px)' }}
-        onClick={e => e.stopPropagation()}
-      >
-        {/* Image */}
-        <div className="relative flex-1 min-h-0 bg-[#1a1a1a]">
           {item.image_url ? (
             <Image
               src={item.image_url}
               alt={item.title}
               fill
               className="object-contain"
-              sizes="(max-width: 768px) 100vw, 65vw"
+              sizes="90vw"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -111,44 +95,30 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
           )}
         </div>
 
-        {/* Info panel */}
-        <div className="w-full md:w-72 bg-[#FAF7F2] flex flex-col justify-between p-8 shrink-0">
-          <div>
-            {item.category && (
-              <span className="text-xs tracking-[0.25em] uppercase text-[#5C3D2E]/40 block mb-4">
-                {categoryLabel(item.category)}
-              </span>
-            )}
-            <h3 className="font-[family-name:var(--font-cormorant)] text-2xl font-light text-[#3D2519] leading-snug mb-4">
-              {item.title}
-            </h3>
-            {item.description && (
-              <p className="text-[#5C3D2E]/60 text-sm leading-relaxed">
-                {item.description}
-              </p>
-            )}
-          </div>
+        {hasNext && (
+          <button
+            onClick={e => { e.stopPropagation(); next() }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/80 transition-colors duration-200 p-2"
+            aria-label="Next"
+          >
+            <ChevronRight size={32} strokeWidth={1} />
+          </button>
+        )}
+      </div>
 
-          {/* Nav buttons */}
-          {items.length > 1 && (
-            <div className="flex gap-3 mt-8">
-              <button
-                onClick={prev}
-                disabled={!hasPrev}
-                className="flex-1 border border-[#5C3D2E]/20 py-2 text-xs tracking-widest uppercase text-[#5C3D2E]/50 hover:border-[#5C3D2E] hover:text-[#5C3D2E] transition-colors disabled:opacity-20 disabled:cursor-default"
-              >
-                ←
-              </button>
-              <button
-                onClick={next}
-                disabled={!hasNext}
-                className="flex-1 border border-[#5C3D2E]/20 py-2 text-xs tracking-widest uppercase text-[#5C3D2E]/50 hover:border-[#5C3D2E] hover:text-[#5C3D2E] transition-colors disabled:opacity-20 disabled:cursor-default"
-              >
-                →
-              </button>
-            </div>
-          )}
-        </div>
+      {/* Caption */}
+      <div
+        className="shrink-0 px-6 py-5 text-center"
+        onClick={e => e.stopPropagation()}
+      >
+        <p className="font-[family-name:var(--font-cormorant)] text-white/80 text-lg font-light tracking-wide">
+          {item.title}
+        </p>
+        {item.category && (
+          <p className="text-white/25 text-xs tracking-[0.2em] uppercase mt-1">
+            {categoryLabel(item.category)}
+          </p>
+        )}
       </div>
     </div>
   )

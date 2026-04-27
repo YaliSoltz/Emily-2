@@ -90,11 +90,12 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
 
       {/* Panel */}
       <div
-        className="flex flex-col md:flex-row w-full max-w-5xl max-h-[90vh] mx-12 shadow-2xl"
+        className="flex flex-col md:flex-row w-full max-w-5xl mx-12 shadow-2xl"
+        style={{ height: 'min(90vh, 700px)' }}
         onClick={e => e.stopPropagation()}
       >
         {/* Image */}
-        <div className="relative flex-1 min-h-[50vh] md:min-h-0 bg-[#1a1a1a]">
+        <div className="relative flex-1 min-h-0 bg-[#1a1a1a]">
           {item.image_url ? (
             <Image
               src={item.image_url}

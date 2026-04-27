@@ -4,7 +4,9 @@ import NavLink from './NavLink'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, ChevronDown } from 'lucide-react'
+import IL from 'country-flag-icons/react/3x2/IL'
+import US from 'country-flag-icons/react/3x2/US'
 
 const navLinks = {
   he: [
@@ -21,9 +23,63 @@ const navLinks = {
   ],
 }
 
+const languages = [
+  { code: 'he' as const, label: 'עברית', Flag: IL },
+  { code: 'en' as const, label: 'English', Flag: US },
+]
+
 interface HeaderProps {
   lang: 'he' | 'en'
   onLangChange: (lang: 'he' | 'en') => void
+}
+
+function LangDropdown({ lang, onLangChange, onClose }: { lang: 'he' | 'en'; onLangChange: (l: 'he' | 'en') => void; onClose?: () => void }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const current = languages.find(l => l.code === lang)!
+
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="flex items-center gap-1.5 text-xs tracking-widest uppercase text-[#5C3D2E]/60 hover:text-[#5C3D2E] transition-colors border border-[#5C3D2E]/20 px-2 py-1.5 rounded"
+      >
+        <current.Flag className="w-4 h-auto rounded-[1px]" />
+        <span>{current.code.toUpperCase()}</span>
+        <ChevronDown size={11} className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {open && (
+        <div className="absolute top-full mt-1 end-0 bg-[#FAF7F2] border border-[#5C3D2E]/10 shadow-md min-w-[120px] z-50">
+          {languages.map(({ code, label, Flag }) => (
+            <button
+              key={code}
+              onClick={() => {
+                onLangChange(code)
+                setOpen(false)
+                onClose?.()
+              }}
+              className={`w-full flex items-center gap-2 px-3 py-2 text-xs tracking-wide hover:bg-[#5C3D2E]/5 transition-colors ${
+                code === lang ? 'text-[#5C3D2E] font-medium' : 'text-[#5C3D2E]/60'
+              }`}
+            >
+              <Flag className="w-5 h-auto rounded-[1px]" />
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
 export default function Header({ lang, onLangChange }: HeaderProps) {
@@ -95,14 +151,7 @@ export default function Header({ lang, onLangChange }: HeaderProps) {
               {link.label}
             </NavLink>
           ))}
-
-          {/* Language switcher */}
-          <button
-            onClick={() => onLangChange(lang === 'he' ? 'en' : 'he')}
-            className="text-xs tracking-widest uppercase text-[#5C3D2E]/50 hover:text-[#5C3D2E] transition-colors border border-[#5C3D2E]/20 px-2 py-1 rounded"
-          >
-            {lang === 'he' ? '🇺🇸 EN' : '🇮🇱 HE'}
-          </button>
+          <LangDropdown lang={lang} onLangChange={onLangChange} />
         </nav>
 
         {/* Mobile hamburger */}
@@ -144,15 +193,9 @@ export default function Header({ lang, onLangChange }: HeaderProps) {
                   {link.label}
                 </NavLink>
               ))}
-              <button
-                onClick={() => {
-                  onLangChange(lang === 'he' ? 'en' : 'he')
-                  setMobileOpen(false)
-                }}
-                className="mt-4 text-xs tracking-widest uppercase text-[#5C3D2E]/50 hover:text-[#5C3D2E] text-start"
-              >
-                {lang === 'he' ? '🇺🇸 Switch to English' : '🇮🇱 עבור לעברית'}
-              </button>
+              <div className="mt-4">
+                <LangDropdown lang={lang} onLangChange={onLangChange} onClose={() => setMobileOpen(false)} />
+              </div>
             </nav>
           </div>
         </div>

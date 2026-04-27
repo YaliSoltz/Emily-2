@@ -10,6 +10,7 @@ interface Props {
   children: React.ReactNode
   contactInfo: { phone: string | null; email: string | null } | null
   socialLinks: { platform: string; url: string }[]
+  initialLang?: 'he' | 'en'
 }
 
 function ShellInner({ children, contactInfo, socialLinks }: Props) {
@@ -28,9 +29,9 @@ function ShellInner({ children, contactInfo, socialLinks }: Props) {
   )
 }
 
-export default function PublicShell({ children, contactInfo, socialLinks }: Props) {
+export default function PublicShell({ children, contactInfo, socialLinks, initialLang }: Props) {
   return (
-    <LangProvider>
+    <LangProvider initialLang={initialLang}>
       <ShellInner contactInfo={contactInfo} socialLinks={socialLinks}>
         {children}
       </ShellInner>

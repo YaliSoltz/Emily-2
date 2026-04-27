@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Heebo, Cormorant_Garamond, Inter } from 'next/font/google'
 import { Suspense } from 'react'
+import { cookies } from 'next/headers'
 import NavigationProgress from '@/components/public/NavigationProgress'
 import './globals.css'
 
@@ -44,15 +45,19 @@ export const metadata: Metadata = {
   keywords: ['Emily Tal', 'textile design', 'עיצוב טקסטיל', 'portfolio', 'knitting', 'screen printing'],
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const cookieStore = await cookies()
+  const langCookie = cookieStore.get('lang')?.value
+  const lang = langCookie === 'en' ? 'en' : 'he'
+
   return (
     <html
-      lang="he"
-      dir="rtl"
+      lang={lang}
+      dir={lang === 'he' ? 'rtl' : 'ltr'}
       className={`${heebo.variable} ${cormorant.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#FAF7F2] text-[#3D2519]">

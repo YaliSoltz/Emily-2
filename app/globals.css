@@ -52,3 +52,91 @@ a, button, [role="button"], label[for], select, summary {
 img {
   transition: opacity 0.3s ease;
 }
+
+/* ── Skip navigation link ─────────────────────────────────── */
+.skip-nav {
+  position: absolute;
+  top: -100%;
+  inset-inline-start: 0;
+  z-index: 9999;
+  background: #5C3D2E;
+  color: #FAF7F2;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  transition: top 0.15s ease;
+  text-decoration: none;
+}
+.skip-nav:focus {
+  top: 0;
+  outline: 3px solid #FAF7F2;
+  outline-offset: -3px;
+}
+
+/* ── Global focus-visible ─────────────────────────────────── */
+:focus-visible {
+  outline: 3px solid #1B5299;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+/* Override focus-visible for elements that have their own focus style */
+input:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-bottom-color: #5C3D2E !important;
+}
+
+/* ── prefers-reduced-motion ───────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  html { scroll-behavior: auto !important; }
+}
+
+/* ── Accessibility widget classes ─────────────────────────── */
+
+/* Text size — applied to <html> */
+.a11y-text-lg body  { zoom: 1.2; }
+.a11y-text-xl body  { zoom: 1.4; }
+
+/* Highlight links */
+.a11y-links a {
+  text-decoration: underline !important;
+  outline: 2px solid currentColor !important;
+  outline-offset: 1px !important;
+  border-radius: 2px !important;
+}
+
+/* Highlight headings */
+.a11y-headings :is(h1, h2, h3, h4, h5, h6) {
+  outline: 2px dashed #1B5299 !important;
+  outline-offset: 4px !important;
+}
+
+/* Readable font */
+.a11y-font * {
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+/* Stop animations */
+.a11y-no-anim *,
+.a11y-no-anim *::before,
+.a11y-no-anim *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+.a11y-no-anim html { scroll-behavior: auto !important; }
+
+/* Letter spacing / dyslexia mode */
+.a11y-spacing :is(p, li, a, span, button, label, td, th) {
+  letter-spacing: 0.1em !important;
+  word-spacing: 0.2em !important;
+  line-height: 1.9 !important;
+}
+
+/* Invert colours (applied via JS to body.style.filter) */

@@ -5,6 +5,7 @@ import Header from './Header'
 import Footer from './Footer'
 import WhatsAppButton from './WhatsAppButton'
 import ScrollToTop from './ScrollToTop'
+import AccessibilityWidget from './AccessibilityWidget'
 
 interface Props {
   children: React.ReactNode
@@ -18,13 +19,17 @@ function ShellInner({ children, contactInfo, socialLinks }: Props) {
 
   return (
     <>
+      <a href="#main-content" className="skip-nav">
+        {lang === 'he' ? 'דלג לתוכן הראשי' : 'Skip to main content'}
+      </a>
       <Header lang={lang} onLangChange={setLang} />
-      <main className="flex-1 pt-16">
+      <main id="main-content" className="flex-1 pt-16">
         {children}
       </main>
       <Footer lang={lang} contactInfo={contactInfo} socialLinks={socialLinks} />
       <WhatsAppButton />
       <ScrollToTop />
+      <AccessibilityWidget />
     </>
   )
 }

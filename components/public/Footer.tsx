@@ -8,8 +8,8 @@ interface FooterProps {
 }
 
 const text = {
-  he: { rights: 'כל הזכויות שמורות', design: 'עיצוב טקסטיל, סריגה, הדפסי רשת', terms: 'תקנון ותנאי שימוש' },
-  en: { rights: 'All rights reserved', design: 'Textile Design, Knitting, Screen Printing', terms: 'Terms of Use' },
+  he: { rights: 'כל הזכויות שמורות', design: 'עיצוב טקסטיל, סריגה, הדפסי רשת', terms: 'תקנון ותנאי שימוש', accessibility: 'הצהרת נגישות' },
+  en: { rights: 'All rights reserved', design: 'Textile Design, Knitting, Screen Printing', terms: 'Terms of Use', accessibility: 'Accessibility Statement' },
 }
 
 export default function Footer({ lang, contactInfo, socialLinks }: FooterProps) {
@@ -70,12 +70,15 @@ export default function Footer({ lang, contactInfo, socialLinks }: FooterProps) 
           <p className="text-xs text-[#F5F0E8]/40 tracking-wider">
             © {new Date().getFullYear()} Emily Tal — {t.rights}
           </p>
-          <Link
-            href="/terms"
-            className="text-xs text-[#F5F0E8]/30 hover:text-[#F5F0E8]/60 tracking-wider transition-colors"
-          >
-            {t.terms}
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/accessibility" className="text-xs text-[#F5F0E8]/50 hover:text-[#F5F0E8]/80 tracking-wider transition-colors">
+              {t.accessibility}
+            </Link>
+            <span className="text-[#F5F0E8]/20" aria-hidden="true">|</span>
+            <Link href="/terms" className="text-xs text-[#F5F0E8]/50 hover:text-[#F5F0E8]/80 tracking-wider transition-colors">
+              {t.terms}
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

@@ -1,6 +1,7 @@
 import { createPublicClient } from '@/lib/supabase/public'
 import type { Metadata } from 'next'
 import GalleryClient from '@/components/public/GalleryClient'
+import { Suspense } from 'react'
 
 export const metadata: Metadata = {
   title: 'גלריה — Emily Tal',
@@ -17,5 +18,9 @@ export default async function GalleryPage() {
     .select('*')
     .order('order_index')
 
-  return <GalleryClient items={items ?? []} />
+  return (
+    <Suspense>
+      <GalleryClient items={items ?? []} />
+    </Suspense>
+  )
 }

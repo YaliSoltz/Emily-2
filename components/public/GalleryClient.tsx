@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 import { useLang } from './LangProvider'
 
 interface GalleryItem {
@@ -130,6 +131,7 @@ interface GalleryClientProps {
 
 export default function GalleryClient({ items }: GalleryClientProps) {
   const { lang } = useLang()
+  const searchParams = useSearchParams()
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [lightboxItem, setLightboxItem] = useState<GalleryItem | null>(null)
 
@@ -137,6 +139,14 @@ export default function GalleryClient({ items }: GalleryClientProps) {
     document.body.style.overflow = lightboxItem ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [lightboxItem])
+
+  useEffect(() => {
+    const openId = searchParams.get('open')
+    if (openId) {
+      const target = items.find(i => i.id === openId) ?? null
+      setLightboxItem(target)
+    }
+  }, [searchParams, items])
 
   // Deduplicate by id, prefer current lang
   const deduped = Object.values(

@@ -76,7 +76,7 @@ export default function HomeClient({ heContent, enContent, galleryPreview }: Hom
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {galleryPreview.map(item => (
-                <NavLink key={item.id} href="/gallery" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
+                <NavLink key={item.id} href={`/gallery?open=${item.id}`} onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
                   <div className="aspect-square bg-[#E8E0D5] overflow-hidden group relative">
                     {item.image_url ? (
                       <Image

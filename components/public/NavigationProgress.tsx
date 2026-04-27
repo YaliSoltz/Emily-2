@@ -11,6 +11,7 @@ export default function NavigationProgress() {
 
   useEffect(() => {
     NProgress.done()
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [pathname])
 
   return (

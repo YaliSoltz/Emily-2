@@ -11,6 +11,7 @@ export default function NavLink({ href, onClick, children, ...props }: Component
   return (
     <Link
       href={href}
+      scroll={false}
       onClick={(e) => {
         if (href !== pathname) NProgress.start()
         onClick?.(e)

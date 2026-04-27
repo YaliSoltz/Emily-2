@@ -124,7 +124,7 @@ export default function Header({ lang, onLangChange }: HeaderProps) {
     >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <NavLink href="/" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
+        <NavLink href="/">
           <Image
             src="/images/logo.svg"
             alt="Emily Tal"
@@ -141,7 +141,6 @@ export default function Header({ lang, onLangChange }: HeaderProps) {
             <NavLink
               key={link.href}
               href={link.href}
-              onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
               className={`text-sm tracking-widest uppercase transition-colors duration-200 ${
                 pathname === link.href
                   ? 'text-[#5C3D2E] border-b border-[#5C3D2E] pb-0.5'
@@ -182,10 +181,7 @@ export default function Header({ lang, onLangChange }: HeaderProps) {
                 <NavLink
                   key={link.href}
                   href={link.href}
-                  onClick={() => {
-                    setMobileOpen(false)
-                    window.scrollTo({ top: 0, behavior: 'instant' })
-                  }}
+                  onClick={() => setMobileOpen(false)}
                   className={`py-3 text-sm tracking-widest uppercase border-b border-[#5C3D2E]/10 transition-colors ${
                     pathname === link.href ? 'text-[#5C3D2E]' : 'text-[#5C3D2E]/60 hover:text-[#5C3D2E]'
                   }`}

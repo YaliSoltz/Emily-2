@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 
 type Lang = 'he' | 'en'
 
@@ -17,11 +17,14 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
     return 'he'
   })
 
+  useEffect(() => {
+    document.documentElement.lang = lang
+    document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr'
+  }, [lang])
+
   const setLang = (l: Lang) => {
     setLangState(l)
     localStorage.setItem('lang', l)
-    document.documentElement.lang = l
-    document.documentElement.dir = l === 'he' ? 'rtl' : 'ltr'
   }
 
   return (

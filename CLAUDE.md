@@ -27,8 +27,16 @@ textile design, knitting, and screen printing. Bilingual: Hebrew (primary) + Eng
 - `/about` — About
 - `/gallery` — Gallery / Portfolio
 - `/contact` — Contact
+- `/privacy` — Privacy Policy (Israeli Amendment 13 compliant)
+- `/terms` — Terms of Use
+- `/accessibility` — Accessibility Statement
 - `/adminlogin` — Admin login
 - `/admin` — Protected admin panel
+
+## Accessibility Widget
+Third-party: **TabNav** (tabnav.com) — loaded via `next/script` in `app/layout.tsx`.
+The script tag includes a unique site token (`req=...`) — do not remove or modify it.
+Do **not** replace with a custom widget. The `/accessibility` page and skip-nav link remain in place alongside it.
 
 ## Key Conventions
 - Server Components by default; `"use client"` only where needed

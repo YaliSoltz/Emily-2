@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Heebo, Cormorant_Garamond, Inter } from 'next/font/google'
 import { Suspense } from 'react'
 import { cookies } from 'next/headers'
+import Script from 'next/script'
 import NavigationProgress from '@/components/public/NavigationProgress'
 import './globals.css'
 
@@ -65,6 +66,15 @@ export default async function RootLayout({
           <NavigationProgress />
         </Suspense>
         {children}
+        <Script
+          src="https://widget.tabnav.com/limited-widget.min.js.gz?req=2_moKYQatPe9KAb17b9WLrdO6vnQnxyE"
+          strategy="afterInteractive"
+          {...{ 'tnv-data-config': '{"language":"he","color":"#405ec3","buttonColor":"#405ec3","buttonSize":"small","widgetSize":"small","widgetLocation":"right","buttonLocation":"bottom"}' }}
+        />
+        <noscript>
+          פתרונות נגישות לאתרי אינטרנט לפי התקן הישראלי 5568{' '}
+          <a href="https://tabnav.com/he">הנגשת אתרים</a>
+        </noscript>
       </body>
     </html>
   )

@@ -5,7 +5,6 @@ import Header from './Header'
 import Footer from './Footer'
 import WhatsAppButton from './WhatsAppButton'
 import ScrollToTop from './ScrollToTop'
-import AccessibilityWidget from './AccessibilityWidget'
 
 interface Props {
   children: React.ReactNode
@@ -29,7 +28,6 @@ function ShellInner({ children, contactInfo, socialLinks }: Props) {
       <Footer lang={lang} contactInfo={contactInfo} socialLinks={socialLinks} />
       <WhatsAppButton />
       <ScrollToTop />
-      <AccessibilityWidget />
     </>
   )
 }

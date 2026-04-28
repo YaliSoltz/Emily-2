@@ -58,7 +58,6 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel, rtl }: Ligh
   return (
     <div
       className="fixed inset-0 z-50 bg-black flex flex-col animate-lightbox-in"
-      onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label={item.title}

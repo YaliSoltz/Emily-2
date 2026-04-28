@@ -237,21 +237,22 @@ export default function GalleryClient({ items }: GalleryClientProps) {
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/6 transition-colors duration-500" />
                 </div>
 
-                {/* Info */}
-                <div className="px-5 pt-4 pb-5 border-t border-[#5C3D2E]/8 flex flex-col gap-1.5">
-                  {item.category && (
-                    <span className="text-[10px] tracking-[0.25em] uppercase text-[#5C3D2E]/50 font-medium">
-                      {categoryLabel(item.category)}
-                    </span>
-                  )}
-                  <h3 className="font-[family-name:var(--font-cormorant)] text-xl font-light text-[#3D2519] leading-snug">
+                {/* Info — fixed-height rows so all cards are identical */}
+                <div className="px-5 pt-4 pb-5 border-t border-[#5C3D2E]/8">
+                  {/* Category — 1 line reserved */}
+                  <p className="h-5 text-[10px] tracking-[0.25em] uppercase text-[#5C3D2E]/50 font-medium overflow-hidden">
+                    {item.category ? categoryLabel(item.category) : ''}
+                  </p>
+                  {/* Title — 2 lines reserved */}
+                  <h3 className="mt-1.5 h-14 font-[family-name:var(--font-cormorant)] text-xl font-light text-[#3D2519] leading-snug line-clamp-2">
                     {item.title}
                   </h3>
-                  {item.description && (
-                    <p className="text-[#5C3D2E]/60 text-xs leading-relaxed line-clamp-2 pt-1.5 border-t border-[#5C3D2E]/8">
-                      {item.description}
+                  {/* Description — 2 lines reserved */}
+                  <div className="mt-2 pt-2 border-t border-[#5C3D2E]/8">
+                    <p className="h-10 text-[#5C3D2E]/60 text-xs leading-relaxed line-clamp-2">
+                      {item.description ?? ''}
                     </p>
-                  )}
+                  </div>
                 </div>
               </button>
             ))}

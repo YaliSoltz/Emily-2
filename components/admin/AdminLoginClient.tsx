@@ -54,13 +54,20 @@ export default function AdminLoginClient() {
     setResetError('')
     setResetLoading(true)
 
-    const supabase = createClient()
-    const redirectTo = `${window.location.origin}/auth/callback?next=/admin/settings`
-    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, { redirectTo })
+    const res = await fetch('/api/admin/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: resetEmail }),
+    })
+    const data = await res.json()
 
     setResetLoading(false)
-    if (error) {
-      setResetError('שגיאה בשליחת המייל. בדוק את הכתובת ונסה שנית.')
+    if (!res.ok) {
+      if (data.error === 'user_not_found') {
+        setResetError('כתובת האימייל אינה רשומה במערכת.')
+      } else {
+        setResetError('שגיאה בשליחת המייל. נסה שנית.')
+      }
     } else {
       setView('reset-sent')
     }

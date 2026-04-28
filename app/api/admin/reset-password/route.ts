@@ -26,17 +26,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'user_not_found' }, { status: 404 })
   }
 
-  // Send reset email
-  const redirectTo = `${request.nextUrl.origin}/auth/callback?next=/adminresetpassword`
-  const anonClient = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-  const { error: resetError } = await anonClient.auth.resetPasswordForEmail(email, { redirectTo })
-
-  if (resetError) {
-    return NextResponse.json({ error: 'send_failed' }, { status: 500 })
-  }
-
+  // User exists — tell the client to proceed with the browser-side reset call
+  // (resetPasswordForEmail must be called from the browser so the PKCE code
+  // verifier is stored in localStorage, not on the server)
   return NextResponse.json({ success: true })
 }

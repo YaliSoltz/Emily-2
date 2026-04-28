@@ -54,6 +54,7 @@ export default function AdminLoginClient() {
     setResetError('')
     setResetLoading(true)
 
+    // Step 1: validate user exists (server-side, service role)
     const res = await fetch('/api/admin/reset-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -61,13 +62,24 @@ export default function AdminLoginClient() {
     })
     const data = await res.json()
 
-    setResetLoading(false)
     if (!res.ok) {
+      setResetLoading(false)
       if (data.error === 'user_not_found') {
         setResetError('כתובת האימייל אינה רשומה במערכת.')
       } else {
         setResetError('שגיאה בשליחת המייל. נסה שנית.')
       }
+      return
+    }
+
+    // Step 2: send reset email from the browser so PKCE verifier lands in localStorage
+    const supabase = createClient()
+    const redirectTo = `${window.location.origin}/auth/callback?next=/adminresetpassword`
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(resetEmail, { redirectTo })
+
+    setResetLoading(false)
+    if (resetError) {
+      setResetError('שגיאה בשליחת המייל. נסה שנית.')
     } else {
       setView('reset-sent')
     }

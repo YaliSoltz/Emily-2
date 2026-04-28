@@ -20,23 +20,23 @@ export default function AdminMessagesPage() {
   const [expanded, setExpanded] = useState<string | null>(null)
   const [search, setSearch] = useState('')
 
-  const load = async () => {
-    const supabase = createClient()
-    const { data } = await supabase.from('messages').select('*').order('submitted_at', { ascending: false })
-    setMessages(data ?? [])
-    setLoading(false)
-  }
-
   useEffect(() => {
-    void (async () => {
-      const supabase = createClient()
+    const supabase = createClient()
+
+    const load = async () => {
       const { data } = await supabase.from('messages').select('*').order('submitted_at', { ascending: false })
       setMessages(data ?? [])
       setLoading(false)
-      supabase.channel('messages-realtime')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, load)
-        .subscribe()
-    })()
+    }
+
+    void load()
+
+    const channel = supabase
+      .channel('messages-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => void load())
+      .subscribe()
+
+    return () => { void supabase.removeChannel(channel) }
   }, [])
 
   const toggleRead = async (id: string, current: boolean) => {

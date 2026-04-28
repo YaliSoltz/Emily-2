@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json()
-  const { name, email, message } = body
+  const { name, email, message, phone } = body
 
   if (!name?.trim() || !email?.trim() || !message?.trim()) {
     return NextResponse.json({ error: 'All fields required' }, { status: 400 })
@@ -32,8 +32,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid email' }, { status: 400 })
   }
 
+  const phoneRegex = /^[+\d\s\-().]{7,20}$/
+  if (phone?.trim() && !phoneRegex.test(phone.trim())) {
+    return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 })
+  }
+
   const supabase = await createClient()
-  const { error } = await supabase.from('messages').insert({ name, email, message })
+  const { error } = await supabase.from('messages').insert({
+    name, email, message,
+    phone: phone?.trim() || null,
+  })
 
   if (error) {
     return NextResponse.json({ error: 'Failed to save message' }, { status: 500 })

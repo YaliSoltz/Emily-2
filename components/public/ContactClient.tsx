@@ -16,7 +16,7 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
   const { lang } = useLang()
   const c = lang === 'he' ? heContent : enContent
 
-  const [form, setForm] = useState({ name: '', email: '', message: '' })
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -36,7 +36,7 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
       setStatus('success')
-      setForm({ name: '', email: '', message: '' })
+      setForm({ name: '', email: '', phone: '', message: '' })
     } catch (err: unknown) {
       setStatus('error')
       setErrorMsg(err instanceof Error ? err.message : 'Error')
@@ -105,6 +105,20 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
                   required
                   value={form.email}
                   onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                  className="w-full bg-transparent border-b border-[#5C3D2E]/30 py-2 text-[#3D2519] focus:outline-none focus:border-[#5C3D2E] transition-colors placeholder:text-[#5C3D2E]/30 text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-xs tracking-[0.2em] uppercase text-[#5C3D2E]/60 block mb-1.5">
+                  {lang === 'he' ? 'טלפון' : 'Phone'}
+                  <span className="text-[#5C3D2E]/35 ms-2 normal-case tracking-normal">
+                    {lang === 'he' ? '(אופציונלי)' : '(optional)'}
+                  </span>
+                </label>
+                <input
+                  type="tel"
+                  value={form.phone}
+                  onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
                   className="w-full bg-transparent border-b border-[#5C3D2E]/30 py-2 text-[#3D2519] focus:outline-none focus:border-[#5C3D2E] transition-colors placeholder:text-[#5C3D2E]/30 text-sm"
                 />
               </div>

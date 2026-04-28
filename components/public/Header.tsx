@@ -2,7 +2,7 @@
 
 import NavLink from './NavLink'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
 import { Menu, X, ChevronDown } from 'lucide-react'
 import IL from 'country-flag-icons/react/3x2/IL'
@@ -84,9 +84,23 @@ function LangDropdown({ lang, onLangChange, onClose }: { lang: 'he' | 'en'; onLa
 
 export default function Header({ lang, onLangChange }: HeaderProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    const now = Date.now()
+    const stored = sessionStorage.getItem('_elc')
+    const prev: number[] = stored ? JSON.parse(stored) : []
+    const recent = [...prev.filter(t => now - t < 1200), now]
+    sessionStorage.setItem('_elc', JSON.stringify(recent))
+    if (recent.length >= 3) {
+      e.preventDefault()
+      sessionStorage.removeItem('_elc')
+      router.push('/adminlogin')
+    }
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -124,7 +138,7 @@ export default function Header({ lang, onLangChange }: HeaderProps) {
     >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <NavLink href="/">
+        <a href="/" onClick={handleLogoClick} aria-label="Emily Tal — דף הבית">
           <Image
             src="/images/logo.svg"
             alt="Emily Tal"
@@ -133,7 +147,7 @@ export default function Header({ lang, onLangChange }: HeaderProps) {
             priority
             className="h-10 w-auto"
           />
-        </NavLink>
+        </a>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8">

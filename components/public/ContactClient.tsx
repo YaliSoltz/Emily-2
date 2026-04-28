@@ -78,9 +78,14 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              <p className="text-[10px] text-[#5C3D2E]/40 tracking-wide">
+                <span aria-hidden="true" className="text-[#B03A2E]">* </span>
+                {lang === 'he' ? 'שדות חובה' : 'Required fields'}
+              </p>
               <div>
                 <label className="text-xs tracking-[0.2em] uppercase text-[#5C3D2E]/60 block mb-1.5">
                   {c.name_label ?? (lang === 'he' ? 'שם' : 'Name')}
+                  <span aria-hidden="true" className="text-[#B03A2E] ms-1">*</span>
                 </label>
                 <input
                   type="text"
@@ -93,6 +98,7 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
               <div>
                 <label className="text-xs tracking-[0.2em] uppercase text-[#5C3D2E]/60 block mb-1.5">
                   {c.email_label ?? (lang === 'he' ? 'אימייל' : 'Email')}
+                  <span aria-hidden="true" className="text-[#B03A2E] ms-1">*</span>
                 </label>
                 <input
                   type="email"
@@ -105,6 +111,7 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
               <div>
                 <label className="text-xs tracking-[0.2em] uppercase text-[#5C3D2E]/60 block mb-1.5">
                   {c.message_label ?? (lang === 'he' ? 'הודעה' : 'Message')}
+                  <span aria-hidden="true" className="text-[#B03A2E] ms-1">*</span>
                 </label>
                 <textarea
                   required

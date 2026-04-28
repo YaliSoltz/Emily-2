@@ -214,7 +214,7 @@ export default function GalleryClient({ items }: GalleryClientProps) {
               <button
                 key={item.id}
                 onClick={() => setLightboxItem(item)}
-                className="group text-start bg-white border border-[#5C3D2E]/8 hover:border-[#5C3D2E]/20 hover:shadow-lg transition-all duration-300 overflow-hidden"
+                className="group text-start bg-white border border-[#5C3D2E]/8 hover:border-[#5C3D2E]/18 hover:shadow-[0_4px_24px_rgba(92,61,46,0.10)] transition-all duration-300 overflow-hidden"
               >
                 {/* Image */}
                 <div className="relative aspect-[4/3] bg-[#E8E0D5] overflow-hidden">
@@ -233,26 +233,25 @@ export default function GalleryClient({ items }: GalleryClientProps) {
                       </span>
                     </div>
                   )}
-                  {/* subtle hover overlay */}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/6 transition-colors duration-500" />
                 </div>
 
-                {/* Info — fixed-height rows so all cards are identical */}
-                <div className="px-5 pt-4 pb-5 border-t border-[#5C3D2E]/8">
-                  {/* Category — 1 line reserved */}
-                  <p className="h-5 text-[10px] tracking-[0.25em] uppercase text-[#5C3D2E]/50 font-medium overflow-hidden">
-                    {item.category ? categoryLabel(item.category) : ''}
-                  </p>
+                {/* Info — fixed-height rows, no divider lines */}
+                <div className="px-5 pt-4 pb-6">
+                  {/* Category chip */}
+                  <div className="h-6 overflow-hidden">
+                    <span className="inline-block bg-[#5C3D2E]/[0.07] text-[#5C3D2E]/65 text-[9px] tracking-[0.18em] uppercase px-2.5 py-[3px] rounded-sm">
+                      {item.category ? categoryLabel(item.category) : '   '}
+                    </span>
+                  </div>
                   {/* Title — 2 lines reserved */}
-                  <h3 className="mt-1.5 h-14 font-[family-name:var(--font-cormorant)] text-xl font-light text-[#3D2519] leading-snug line-clamp-2">
+                  <h3 className="mt-3 h-14 font-[family-name:var(--font-cormorant)] text-xl font-light text-[#3D2519] leading-snug line-clamp-2 overflow-hidden">
                     {item.title}
                   </h3>
                   {/* Description — 2 lines reserved */}
-                  <div className="mt-2 pt-2 border-t border-[#5C3D2E]/8">
-                    <p className="h-10 text-[#5C3D2E]/60 text-xs leading-relaxed line-clamp-2">
-                      {item.description ?? ''}
-                    </p>
-                  </div>
+                  <p className="mt-3 h-10 text-[#5C3D2E]/55 text-xs leading-relaxed line-clamp-2 overflow-hidden">
+                    {item.description ?? ''}
+                  </p>
                 </div>
               </button>
             ))}

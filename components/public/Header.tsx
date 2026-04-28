@@ -99,6 +99,8 @@ export default function Header({ lang, onLangChange }: HeaderProps) {
     if (recent.length >= 3) {
       sessionStorage.removeItem('_elc')
       router.push('/adminlogin')
+    } else if (pathname === '/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     } else {
       router.push('/')
     }

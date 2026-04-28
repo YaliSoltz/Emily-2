@@ -18,7 +18,12 @@ export default function AdminContactInfoPage() {
     const load = async () => {
       const supabase = createClient()
       const { data } = await supabase.from('contact_info').select('*').single()
-      const c = data ?? empty
+      const c: ContactInfo = {
+        id: data?.id,
+        phone: data?.phone ?? '',
+        email: data?.email ?? '',
+        address: data?.address ?? '',
+      }
       setInfo(c); setSaved(c); setLoading(false)
     }
     load()

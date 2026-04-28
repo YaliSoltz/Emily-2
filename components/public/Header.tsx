@@ -90,15 +90,17 @@ export default function Header({ lang, onLangChange }: HeaderProps) {
   const menuRef = useRef<HTMLDivElement>(null)
 
   const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault()
     const now = Date.now()
     const stored = sessionStorage.getItem('_elc')
     const prev: number[] = stored ? JSON.parse(stored) : []
     const recent = [...prev.filter(t => now - t < 1200), now]
     sessionStorage.setItem('_elc', JSON.stringify(recent))
     if (recent.length >= 3) {
-      e.preventDefault()
       sessionStorage.removeItem('_elc')
       router.push('/adminlogin')
+    } else {
+      router.push('/')
     }
   }
 

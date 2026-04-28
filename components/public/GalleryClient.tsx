@@ -235,7 +235,7 @@ export default function GalleryClient({ items }: GalleryClientProps) {
                       src={item.image_url}
                       alt={item.title}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-200"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                       sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
                     />
                   ) : (

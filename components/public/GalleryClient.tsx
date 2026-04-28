@@ -49,19 +49,24 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
   }, [onClose, prev, next])
 
   return (
-    <div className="fixed inset-0 z-50 bg-black flex flex-col" onClick={onClose}>
-
+    <div
+      className="fixed inset-0 z-50 bg-black flex flex-col animate-lightbox-in"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={item.title}
+    >
       {/* Top bar */}
       <div className="flex items-center justify-between px-6 py-4 shrink-0" onClick={e => e.stopPropagation()}>
-        <span className="text-white/25 text-xs tracking-[0.2em] font-light">
+        <span className="text-white/60 text-xs tracking-[0.2em] font-light">
           {String(idx + 1).padStart(2, '0')} / {String(items.length).padStart(2, '0')}
         </span>
         <button
           onClick={onClose}
-          className="text-white/40 hover:text-white transition-colors duration-200 p-1"
+          className="text-white/75 hover:text-white transition-colors duration-200 p-2 -me-2"
           aria-label="Close"
         >
-          <X size={20} strokeWidth={1.5} />
+          <X size={22} strokeWidth={1.25} />
         </button>
       </div>
 
@@ -70,7 +75,7 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
         {hasPrev && (
           <button
             onClick={e => { e.stopPropagation(); prev() }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/80 transition-colors duration-200 p-2"
+            className="absolute start-2 top-1/2 -translate-y-1/2 text-white/65 hover:text-white transition-colors duration-200 p-3"
             aria-label="Previous"
           >
             <ChevronLeft size={32} strokeWidth={1} />
@@ -78,7 +83,8 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
         )}
 
         <div
-          className="relative w-full h-full"
+          key={item.id}
+          className="relative w-full h-full animate-lightbox-image"
           onClick={e => e.stopPropagation()}
         >
           {item.image_url ? (
@@ -91,7 +97,7 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <span className="text-white/20 text-xs tracking-widest uppercase">{item.title}</span>
+              <span className="text-white/30 text-xs tracking-widest uppercase">{item.title}</span>
             </div>
           )}
         </div>
@@ -99,7 +105,7 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
         {hasNext && (
           <button
             onClick={e => { e.stopPropagation(); next() }}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/80 transition-colors duration-200 p-2"
+            className="absolute end-2 top-1/2 -translate-y-1/2 text-white/65 hover:text-white transition-colors duration-200 p-3"
             aria-label="Next"
           >
             <ChevronRight size={32} strokeWidth={1} />
@@ -109,17 +115,18 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
 
       {/* Caption */}
       <div
-        className="shrink-0 px-6 py-5 text-center"
+        key={`caption-${item.id}`}
+        className="shrink-0 px-6 py-5 text-center animate-lightbox-image"
         onClick={e => e.stopPropagation()}
       >
-        <p className="font-[family-name:var(--font-cormorant)] text-white/80 text-lg font-light tracking-wide">
-          {item.title}
-        </p>
         {item.category && (
-          <p className="text-white/25 text-xs tracking-[0.2em] uppercase mt-1">
+          <p className="text-white/55 text-[10px] tracking-[0.25em] uppercase mb-2">
             {categoryLabel(item.category)}
           </p>
         )}
+        <p className="font-[family-name:var(--font-cormorant)] text-white/95 text-xl font-light tracking-wide">
+          {item.title}
+        </p>
       </div>
     </div>
   )
@@ -207,7 +214,7 @@ export default function GalleryClient({ items }: GalleryClientProps) {
               <button
                 key={item.id}
                 onClick={() => setLightboxItem(item)}
-                className="group text-start bg-white border border-[#5C3D2E]/8 hover:border-[#5C3D2E]/20 hover:shadow-md transition-all duration-300"
+                className="group text-start bg-white border border-[#5C3D2E]/8 hover:border-[#5C3D2E]/20 hover:shadow-lg transition-all duration-300 overflow-hidden"
               >
                 {/* Image */}
                 <div className="relative aspect-[4/3] bg-[#E8E0D5] overflow-hidden">
@@ -216,7 +223,7 @@ export default function GalleryClient({ items }: GalleryClientProps) {
                       src={item.image_url}
                       alt={item.title}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="object-cover group-hover:scale-[1.04] transition-transform duration-700 ease-out"
                       sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
                     />
                   ) : (
@@ -226,20 +233,22 @@ export default function GalleryClient({ items }: GalleryClientProps) {
                       </span>
                     </div>
                   )}
+                  {/* subtle hover overlay */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/6 transition-colors duration-500" />
                 </div>
 
                 {/* Info */}
-                <div className="p-4">
+                <div className="px-5 pt-4 pb-5 border-t border-[#5C3D2E]/8 flex flex-col gap-1.5">
                   {item.category && (
-                    <span className="text-[10px] tracking-[0.2em] uppercase text-[#5C3D2E]/40 block mb-1.5">
+                    <span className="text-[10px] tracking-[0.25em] uppercase text-[#5C3D2E]/50 font-medium">
                       {categoryLabel(item.category)}
                     </span>
                   )}
-                  <h3 className="font-[family-name:var(--font-cormorant)] text-lg font-light text-[#3D2519] leading-snug mb-2">
+                  <h3 className="font-[family-name:var(--font-cormorant)] text-xl font-light text-[#3D2519] leading-snug">
                     {item.title}
                   </h3>
                   {item.description && (
-                    <p className="text-[#5C3D2E]/55 text-xs leading-relaxed line-clamp-2">
+                    <p className="text-[#5C3D2E]/60 text-xs leading-relaxed line-clamp-2 pt-1.5 border-t border-[#5C3D2E]/8">
                       {item.description}
                     </p>
                   )}

@@ -14,6 +14,26 @@ const content = {
         body: 'האתר עומד בדרישות תקן ישראלי 5568 (המבוסס על WCAG 2.2) ברמה AA. הנגישות נבדקת באופן שוטף ומעודכנת בהתאם לשינויים בתקן.',
       },
       {
+        title: 'כלי הנגישות',
+        body: 'האתר מצויד בתפריט נגישות המופעל על ידי TabNav (tabnav.com) — ספק נגישות מורשה לפי התקן הישראלי 5568. התפריט מאפשר למשתמשים להתאים את חוויית הגלישה לצרכיהם.',
+        tabnav: true,
+      },
+      {
+        title: 'תכונות נגישות באתר',
+        list: [
+          'תפריט נגישות צף המאפשר התאמות תצוגה מגוונות (מסופק על ידי TabNav)',
+          'קישור "דלג לתוכן הראשי" — מופיע בלחיצה ראשונה על Tab',
+          'כל התמונות כוללות טקסט חלופי (alt text)',
+          'היררכיית כותרות תקנית (H1–H3)',
+          'מאפייני ARIA לכל הרכיבים האינטראקטיביים',
+          'ניהול פוקוס במודאלים ובתפריטים',
+          'תמיכה מלאה בכיוון RTL (עברית) ו-LTR (אנגלית)',
+          'ניגודיות צבעים עומדת בדרישות WCAG 2.2 AA (מינימום 4.5:1 לטקסט רגיל)',
+          'אין תנועה או הבהוב ללא אפשרות עצירה',
+          'ניווט מקלדת מלא ללא עכבר',
+        ],
+      },
+      {
         title: 'טכנולוגיות נתמכות',
         body: 'האתר נבדק ותואם לטכנולוגיות הסיוע הבאות:',
         list: [
@@ -24,22 +44,8 @@ const content = {
         ],
       },
       {
-        title: 'תכונות נגישות באתר',
-        list: [
-          'כפתור נגישות צף המאפשר: הגדלת טקסט, ניגודיות גבוהה, גווני אפור, הדגשת קישורים, גופן קריא, עצירת אנימציות וריווח מוגדל',
-          'קישור "דלג לתוכן הראשי" בלחיצה על Tab',
-          'כל התמונות כוללות טקסט חלופי (alt text)',
-          'היררכיית כותרות תקנית (H1–H3)',
-          'מאפייני ARIA לכל הרכיבים האינטראקטיביים',
-          'ניהול פוקוס במודאלים ובתפריטים',
-          'תמיכה מלאה בכיוון RTL (עברית) ו-LTR (אנגלית)',
-          'עומד בדרישות יחס ניגודיות צבעים WCAG 2.2 AA (מינימום 4.5:1 לטקסט רגיל, 3:1 לטקסט גדול)',
-          'לא נעשה שימוש בתנועה/הבהוב ללא אפשרות עצירה',
-        ],
-      },
-      {
         title: 'מגבלות נגישות ידועות',
-        body: 'אנו עורכים מאמץ מתמיד לנגישות מלאה. ייתכנו מגבלות זמניות בתוכן שמוסף בזמן אמת. אנו פועלים לתיקונן בהקדם.',
+        body: 'אנו עורכים מאמץ מתמיד לנגישות מלאה. ייתכנו מגבלות זמניות בתוכן חדש שמוסף לאתר. אנו פועלים לתיקונן בהקדם האפשרי.',
       },
       {
         title: 'יצירת קשר בנושא נגישות',
@@ -47,7 +53,7 @@ const content = {
       },
       {
         title: 'אכיפה',
-        body: 'במקרה שתחושו שאינכם מקבלים מענה הולם לבקשת הנגישות, ניתן לפנות לנציב שוויון זכויות לאנשים עם מוגבלות במשרד המשפטים.',
+        body: 'במקרה שאינכם מקבלים מענה הולם לבקשת הנגישות, ניתן לפנות לנציב שוויון זכויות לאנשים עם מוגבלות במשרד המשפטים.',
       },
     ],
   },
@@ -62,6 +68,26 @@ const content = {
         body: 'This website conforms to Israeli Standard 5568 (based on WCAG 2.2) at Level AA. We regularly audit and update accessibility as standards evolve.',
       },
       {
+        title: 'Accessibility Widget',
+        body: 'The website is equipped with an accessibility menu powered by TabNav (tabnav.com) — a certified accessibility provider under Israeli Standard 5568. The menu allows users to customise their browsing experience to suit their needs.',
+        tabnav: true,
+      },
+      {
+        title: 'Accessibility Features',
+        list: [
+          'Floating accessibility menu with display adjustments (powered by TabNav)',
+          '"Skip to main content" link — appears on first Tab press',
+          'All images include descriptive alternative text (alt text)',
+          'Proper heading hierarchy (H1–H3)',
+          'ARIA attributes on all interactive components',
+          'Focus management in modals and menus',
+          'Full RTL (Hebrew) and LTR (English) direction support',
+          'Colour contrast meets WCAG 2.2 AA requirements (minimum 4.5:1 for normal text)',
+          'No motion or flashing content without a stop mechanism',
+          'Full keyboard navigation without a mouse',
+        ],
+      },
+      {
         title: 'Supported Technologies',
         body: 'This website has been tested and is compatible with the following assistive technologies:',
         list: [
@@ -72,22 +98,8 @@ const content = {
         ],
       },
       {
-        title: 'Accessibility Features',
-        list: [
-          'Floating accessibility widget: text size adjustment, high contrast, grayscale, link highlighting, readable font, stop animations, letter spacing',
-          '"Skip to main content" link (press Tab on page load)',
-          'All images include descriptive alternative text (alt text)',
-          'Proper heading hierarchy (H1–H3)',
-          'ARIA attributes on all interactive components',
-          'Focus management in modals and menus',
-          'Full RTL (Hebrew) and LTR (English) direction support',
-          'Colour contrast ratios meet WCAG 2.2 AA (minimum 4.5:1 for normal text, 3:1 for large text)',
-          'No motion/flashing content without a stop mechanism',
-        ],
-      },
-      {
         title: 'Known Limitations',
-        body: 'We make every effort to ensure full accessibility. There may be temporary limitations in dynamically added content. We work to resolve these promptly.',
+        body: 'We make every effort to ensure full accessibility. There may be temporary limitations in newly added content. We work to resolve these as promptly as possible.',
       },
       {
         title: 'Contact for Accessibility',

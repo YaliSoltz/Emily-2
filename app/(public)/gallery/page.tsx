@@ -1,7 +1,7 @@
-import { createPublicClient } from '@/lib/supabase/public'
 import type { Metadata } from 'next'
 import GalleryClient from '@/components/public/GalleryClient'
 import { Suspense } from 'react'
+import { getGalleryItems } from '@/lib/queries'
 
 export const metadata: Metadata = {
   title: 'גלריה — Emily Tal',
@@ -11,16 +11,11 @@ export const metadata: Metadata = {
 export const revalidate = 3600
 
 export default async function GalleryPage() {
-  const supabase = createPublicClient()
-
-  const { data: items } = await supabase
-    .from('gallery_items')
-    .select('*')
-    .order('order_index')
+  const items = await getGalleryItems()
 
   return (
     <Suspense>
-      <GalleryClient items={items ?? []} />
+      <GalleryClient items={items} />
     </Suspense>
   )
 }

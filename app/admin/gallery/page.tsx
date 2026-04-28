@@ -1,7 +1,24 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+  useSortable,
+  arrayMove,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import AdminTabLayout from '@/components/admin/AdminTabLayout'
 import AdminModal from '@/components/admin/AdminModal'
 import ImageUpload from '@/components/admin/ImageUpload'
@@ -19,40 +36,103 @@ interface GalleryItem {
   language: string
 }
 
-const empty = { id: '', title: '', description: '', image_url: '', category: 'textile', order_index: 0, language: 'he' }
+const empty: GalleryItem = { id: '', title: '', description: '', image_url: '', category: 'textile', order_index: 0, language: 'he' }
 
 const categories = [
-  { value: 'textile', label: 'עיצוב טקסטיל' },
-  { value: 'knitting', label: 'סריגה' },
+  { value: 'textile',        label: 'עיצוב טקסטיל' },
+  { value: 'knitting',       label: 'סריגה' },
   { value: 'screen-printing', label: 'הדפסי רשת' },
 ]
+
+interface SortableItemProps {
+  item: GalleryItem
+  onEdit: (item: GalleryItem) => void
+  onDelete: (id: string) => void
+}
+
+function SortableGalleryItem({ item, onEdit, onDelete }: SortableItemProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id })
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={`group relative bg-white border border-[#5C3D2E]/10 overflow-hidden ${isDragging ? 'opacity-40 shadow-xl z-50' : ''}`}
+    >
+      {/* Drag handle */}
+      <button
+        {...attributes}
+        {...listeners}
+        className="absolute top-2 right-2 z-10 bg-white/90 text-[#5C3D2E]/40 hover:text-[#5C3D2E] p-1.5 cursor-grab active:cursor-grabbing touch-none transition-colors"
+        aria-label="גרור לשינוי סדר"
+      >
+        <GripVertical size={12} />
+      </button>
+
+      <div className="aspect-square bg-[#E8E0D5] relative">
+        {item.image_url ? (
+          <Image src={item.image_url} alt={item.title} fill className="object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="text-[#5C3D2E]/20 text-xs">ללא תמונה</span>
+          </div>
+        )}
+      </div>
+
+      <div className="p-3">
+        <p className="text-xs font-medium text-[#3D2519] truncate">{item.title}</p>
+        <p className="text-[10px] text-[#5C3D2E]/50 mt-0.5">
+          {categories.find(c => c.value === item.category)?.label ?? item.category}
+        </p>
+      </div>
+
+      {/* Edit / Delete — visible on hover */}
+      <div className="absolute top-2 left-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          onClick={() => onEdit(item)}
+          className="bg-white/90 text-[#5C3D2E] p-1.5 hover:bg-[#5C3D2E] hover:text-white transition-colors"
+        >
+          <Pencil size={12} />
+        </button>
+        <button
+          onClick={() => onDelete(item.id)}
+          className="bg-white/90 text-red-500 p-1.5 hover:bg-red-500 hover:text-white transition-colors"
+        >
+          <Trash2 size={12} />
+        </button>
+      </div>
+    </div>
+  )
+}
 
 export default function AdminGalleryPage() {
   const [items, setItems] = useState<GalleryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState<'add' | 'edit' | null>(null)
-  const [editing, setEditing] = useState<GalleryItem>(empty as GalleryItem)
+  const [editing, setEditing] = useState<GalleryItem>(empty)
   const [saving, setSaving] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
-  const load = async () => {
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  )
+
+  const load = useCallback(async () => {
     const supabase = createClient()
-    const { data } = await supabase.from('gallery_items').select('*').eq('language', 'he').order('order_index')
+    const { data } = await supabase
+      .from('gallery_items')
+      .select('*')
+      .eq('language', 'he')
+      .order('order_index')
     setItems(data ?? [])
     setLoading(false)
-  }
-
-  useEffect(() => {
-    void (async () => {
-      const supabase = createClient()
-      const { data } = await supabase.from('gallery_items').select('*').eq('language', 'he').order('order_index')
-      setItems(data ?? [])
-      setLoading(false)
-    })()
   }, [])
 
+  useEffect(() => { void load() }, [load])
+
   const openAdd = () => {
-    setEditing({ ...empty, order_index: items.length } as GalleryItem)
+    setEditing({ ...empty, order_index: items.length })
     setModal('add')
   }
 
@@ -62,7 +142,6 @@ export default function AdminGalleryPage() {
     setSaving(true)
     const supabase = createClient()
     const { id, ...rest } = editing
-
     if (modal === 'add') {
       await supabase.from('gallery_items').insert({ ...rest, language: 'he' })
     } else {
@@ -80,15 +159,21 @@ export default function AdminGalleryPage() {
     setDeleteId(null)
   }
 
-  const moveItem = async (id: string, dir: -1 | 1) => {
-    const idx = items.findIndex(i => i.id === id)
-    if (idx + dir < 0 || idx + dir >= items.length) return
-    const updated = [...items]
-    const tmp = updated[idx]; updated[idx] = updated[idx + dir]; updated[idx + dir] = tmp
-    const reindexed = updated.map((item, i) => ({ ...item, order_index: i }))
-    setItems(reindexed)
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const oldIdx = items.findIndex(i => i.id === String(active.id))
+    const newIdx = items.findIndex(i => i.id === String(over.id))
+    const reordered = arrayMove(items, oldIdx, newIdx).map((item, i) => ({ ...item, order_index: i }))
+    setItems(reordered)
+
     const supabase = createClient()
-    await Promise.all(reindexed.map(item => supabase.from('gallery_items').update({ order_index: item.order_index }).eq('id', item.id)))
+    await Promise.all(
+      reordered.map(item =>
+        supabase.from('gallery_items').update({ order_index: item.order_index }).eq('id', item.id)
+      )
+    )
   }
 
   if (loading) return <div className="p-8 text-sm text-[#5C3D2E]/50">טוען...</div>
@@ -97,7 +182,10 @@ export default function AdminGalleryPage() {
     <AdminTabLayout title="גלריה" hasChanges={false} onSave={async () => {}} onCancel={() => {}} hideSaveCancel>
       <div className="flex justify-between items-center mb-6">
         <p className="text-sm text-[#5C3D2E]/60">{items.length} עבודות</p>
-        <button onClick={openAdd} className="flex items-center gap-2 bg-[#5C3D2E] text-[#F5F0E8] px-4 py-2 text-xs tracking-widest uppercase hover:bg-[#3D2519] transition-colors">
+        <button
+          onClick={openAdd}
+          className="flex items-center gap-2 bg-[#5C3D2E] text-[#F5F0E8] px-4 py-2 text-xs tracking-widest uppercase hover:bg-[#3D2519] transition-colors"
+        >
           <Plus size={14} /> הוסף עבודה
         </button>
       </div>
@@ -107,41 +195,20 @@ export default function AdminGalleryPage() {
           אין עבודות עדיין. לחץ על &ldquo;הוסף עבודה&rdquo; כדי להתחיל.
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {items.map(item => (
-            <div key={item.id} className="group relative bg-white border border-[#5C3D2E]/10 overflow-hidden">
-              <div className="aspect-square bg-[#E8E0D5] relative">
-                {item.image_url ? (
-                  <Image src={item.image_url} alt={item.title} fill className="object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-[#5C3D2E]/20 text-xs">ללא תמונה</span>
-                  </div>
-                )}
-              </div>
-              <div className="p-3">
-                <p className="text-xs font-medium text-[#3D2519] truncate">{item.title}</p>
-                <p className="text-[10px] text-[#5C3D2E]/50 mt-0.5">
-                  {categories.find(c => c.value === item.category)?.label ?? item.category}
-                </p>
-              </div>
-              {/* Actions */}
-              <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => moveItem(item.id, -1)} className="bg-white/90 text-[#5C3D2E] p-1.5" title="הזז למעלה">
-                  <GripVertical size={12} />
-                </button>
-              </div>
-              <div className="absolute top-2 left-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => openEdit(item)} className="bg-white/90 text-[#5C3D2E] p-1.5 hover:bg-[#5C3D2E] hover:text-white transition-colors">
-                  <Pencil size={12} />
-                </button>
-                <button onClick={() => setDeleteId(item.id)} className="bg-white/90 text-red-500 p-1.5 hover:bg-red-500 hover:text-white transition-colors">
-                  <Trash2 size={12} />
-                </button>
-              </div>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={items.map(i => i.id)} strategy={rectSortingStrategy}>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {items.map(item => (
+                <SortableGalleryItem
+                  key={item.id}
+                  item={item}
+                  onEdit={openEdit}
+                  onDelete={setDeleteId}
+                />
+              ))}
             </div>
-          ))}
-        </div>
+          </SortableContext>
+        </DndContext>
       )}
 
       {/* Add / Edit Modal */}
@@ -188,7 +255,9 @@ export default function AdminGalleryPage() {
 
       {/* Delete confirm */}
       {deleteId && (
-        <AdminModal title="מחיקת עבודה" onClose={() => setDeleteId(null)}
+        <AdminModal
+          title="מחיקת עבודה"
+          onClose={() => setDeleteId(null)}
           footer={
             <>
               <button onClick={() => setDeleteId(null)} className="px-4 py-2 text-xs tracking-widest uppercase border border-[#5C3D2E]/20 text-[#5C3D2E]">ביטול</button>

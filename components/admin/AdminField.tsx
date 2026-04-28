@@ -1,5 +1,10 @@
+'use client'
+
+import { useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
+
 interface AdminFieldProps {
-  label: string
+  label: React.ReactNode
   children: React.ReactNode
   hint?: string
 }
@@ -21,6 +26,28 @@ export function AdminInput(props: AdminInputProps) {
       {...props}
       className={`w-full bg-white border border-[#5C3D2E]/15 px-3 py-2 text-sm text-[#3D2519] focus:outline-none focus:border-[#5C3D2E]/40 transition-colors ${props.className ?? ''}`}
     />
+  )
+}
+
+type AdminPasswordInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'>
+export function AdminPasswordInput(props: AdminPasswordInputProps) {
+  const [show, setShow] = useState(false)
+  return (
+    <div className="relative">
+      <input
+        {...props}
+        type={show ? 'text' : 'password'}
+        className={`w-full bg-white border border-[#5C3D2E]/15 ps-3 pe-9 py-2 text-sm text-[#3D2519] focus:outline-none focus:border-[#5C3D2E]/40 transition-colors ${props.className ?? ''}`}
+      />
+      <button
+        type="button"
+        onClick={() => setShow(v => !v)}
+        className="absolute inset-y-0 end-0 px-2.5 flex items-center text-[#5C3D2E]/35 hover:text-[#5C3D2E] transition-colors"
+        aria-label={show ? 'הסתר סיסמה' : 'הצג סיסמה'}
+      >
+        {show ? <EyeOff size={14} /> : <Eye size={14} />}
+      </button>
+    </div>
   )
 }
 

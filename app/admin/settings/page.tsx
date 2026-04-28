@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import AdminTabLayout from '@/components/admin/AdminTabLayout'
-import { AdminField, AdminInput } from '@/components/admin/AdminField'
+import { AdminField, AdminPasswordInput } from '@/components/admin/AdminField'
 import { LogOut } from 'lucide-react'
 import { Suspense } from 'react'
 
@@ -73,13 +73,13 @@ function SettingsForm() {
           <h2 className="text-sm tracking-widest uppercase text-[#3D2519] mb-5">שינוי סיסמה</h2>
           <form onSubmit={handleChangePassword} className="flex flex-col gap-4">
             <AdminField label="סיסמה נוכחית">
-              <AdminInput type="password" value={current} onChange={e => setCurrent(e.target.value)} required />
+              <AdminPasswordInput value={current} onChange={e => setCurrent(e.target.value)} required />
             </AdminField>
             <AdminField label="סיסמה חדשה">
-              <AdminInput type="password" value={next} onChange={e => setNext(e.target.value)} required minLength={6} />
+              <AdminPasswordInput value={next} onChange={e => setNext(e.target.value)} required minLength={6} />
             </AdminField>
             <AdminField label="אימות סיסמה חדשה">
-              <AdminInput type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required />
+              <AdminPasswordInput value={confirm} onChange={e => setConfirm(e.target.value)} required />
             </AdminField>
 
             {error && <p className="text-xs text-red-600">{error}</p>}

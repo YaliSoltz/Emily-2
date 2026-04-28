@@ -2,11 +2,12 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useAdminNav } from './AdminNavContext'
 import {
   LayoutDashboard, Home, User, Image, Mail, Phone,
-  Share2, HardDrive, Settings, LogOut, X, Menu
+  Share2, HardDrive, Settings, LogOut, X, Menu, ExternalLink
 } from 'lucide-react'
 
 const tabs = [
@@ -59,7 +60,16 @@ function NavContent({ pathname, onTabClick, onLogout }: NavContentProps) {
         })}
       </nav>
 
-      <div className="border-t border-[#5C3D2E]/10 p-4">
+      <div className="border-t border-[#5C3D2E]/10 p-4 flex flex-col gap-3">
+        <a
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 text-sm text-[#5C3D2E]/50 hover:text-[#5C3D2E] transition-colors"
+        >
+          <ExternalLink size={15} />
+          צפייה באתר
+        </a>
         <button
           onClick={onLogout}
           className="flex items-center gap-3 text-sm text-[#5C3D2E]/50 hover:text-red-600 transition-colors w-full"
@@ -72,15 +82,24 @@ function NavContent({ pathname, onTabClick, onLogout }: NavContentProps) {
   )
 }
 
-interface AdminSidebarProps {
-  hasChanges?: boolean
-  onNavigateAway?: (href: string) => boolean
-}
-
-export default function AdminSidebar({ hasChanges, onNavigateAway }: AdminSidebarProps) {
+export default function AdminSidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { requestNavigate } = useAdminNav()
+
+  useEffect(() => {
+    if (!mobileOpen) return
+    // Lock both body and the admin's internal scroll container (<main>)
+    const main = document.querySelector<HTMLElement>('main')
+    const prevMainOverflow = main?.style.overflowY ?? ''
+    document.body.style.overflow = 'hidden'
+    if (main) main.style.overflowY = 'hidden'
+    return () => {
+      document.body.style.overflow = ''
+      if (main) main.style.overflowY = prevMainOverflow
+    }
+  }, [mobileOpen])
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -90,10 +109,8 @@ export default function AdminSidebar({ hasChanges, onNavigateAway }: AdminSideba
 
   const handleTabClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (pathname === href) { e.preventDefault(); return }
-    if (hasChanges && onNavigateAway) {
-      const canLeave = onNavigateAway(href)
-      if (!canLeave) e.preventDefault()
-    }
+    const canLeave = requestNavigate(href)
+    if (!canLeave) { e.preventDefault(); return }
     window.scrollTo({ top: 0, behavior: 'instant' })
     setMobileOpen(false)
   }
@@ -117,9 +134,9 @@ export default function AdminSidebar({ hasChanges, onNavigateAway }: AdminSideba
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div className="fixed inset-0 z-50 md:hidden touch-none">
           <div className="absolute inset-0 bg-black/30" onClick={() => setMobileOpen(false)} />
-          <aside className="absolute top-0 right-0 w-64 h-full bg-white shadow-xl flex flex-col">
+          <aside className="absolute top-0 right-0 w-64 h-full bg-white shadow-xl flex flex-col touch-auto">
             <div className="flex items-center justify-between px-4 h-12 border-b border-[#5C3D2E]/10">
               <p className="font-[family-name:var(--font-cormorant)] text-base text-[#3D2519] tracking-widest">
                 EMILY TAL

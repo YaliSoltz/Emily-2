@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import AdminSidebar from './AdminSidebar'
+import { useAdminNav } from './AdminNavContext'
 import UnsavedDialog from './UnsavedDialog'
 
 interface AdminTabLayoutProps {
@@ -25,10 +25,22 @@ export default function AdminTabLayout({
   hideSaveCancel = false,
 }: AdminTabLayoutProps) {
   const router = useRouter()
+  const { registerNavigateAway } = useAdminNav()
   const [saving, setSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [dialogPendingHref, setDialogPendingHref] = useState<string | null>(null)
   const pendingHrefRef = useRef<string | null>(null)
+
+  const handleNavigateAway = useCallback((href: string): boolean => {
+    pendingHrefRef.current = href
+    setDialogPendingHref(href)
+    return false
+  }, [])
+
+  useEffect(() => {
+    registerNavigateAway(hasChanges ? handleNavigateAway : null)
+    return () => registerNavigateAway(null)
+  }, [hasChanges, handleNavigateAway, registerNavigateAway])
 
   const handleSave = async () => {
     setSaving(true)
@@ -41,13 +53,6 @@ export default function AdminTabLayout({
       setSaving(false)
     }
   }
-
-  const handleNavigateAway = useCallback((href: string): boolean => {
-    if (!hasChanges) return true
-    pendingHrefRef.current = href
-    setDialogPendingHref(href)
-    return false
-  }, [hasChanges])
 
   const handleDialogLeave = () => {
     const href = pendingHrefRef.current
@@ -62,43 +67,38 @@ export default function AdminTabLayout({
   }
 
   return (
-    <div className="flex min-h-screen" dir="rtl">
-      <AdminSidebar hasChanges={hasChanges} onNavigateAway={handleNavigateAway} />
+    <div className="md:mr-56 flex flex-col h-dvh">
+      {/* Header — stays put because main scrolls internally, not the body */}
+      <header className="flex-shrink-0 z-20 bg-white border-b border-[#5C3D2E]/10 px-6 h-14 flex items-center justify-between md:mt-0 mt-12">
+        <h1 className="text-sm tracking-widest uppercase text-[#3D2519] font-medium">{title}</h1>
 
-      {/* Main content — offset for sidebar */}
-      <div className="flex-1 md:mr-56 flex flex-col">
-        {/* Sticky header */}
-        <header className="sticky top-0 z-20 bg-white border-b border-[#5C3D2E]/10 px-6 h-14 flex items-center justify-between md:mt-0 mt-12">
-          <h1 className="text-sm tracking-widest uppercase text-[#3D2519] font-medium">{title}</h1>
+        {!hideSaveCancel && (
+          <div className="flex items-center gap-3">
+            {saveSuccess && (
+              <span className="text-xs text-green-600 tracking-wide">✓ נשמר</span>
+            )}
+            <button
+              onClick={onCancel}
+              disabled={!hasChanges}
+              className="px-4 py-1.5 text-xs tracking-widest uppercase text-[#5C3D2E] border border-[#5C3D2E]/20 hover:border-[#5C3D2E]/50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              ביטול
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={!hasChanges || saving}
+              className="px-4 py-1.5 text-xs tracking-widest uppercase bg-[#5C3D2E] text-[#F5F0E8] hover:bg-[#3D2519] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              {saving ? 'שומר...' : saveLabel}
+            </button>
+          </div>
+        )}
+      </header>
 
-          {!hideSaveCancel && (
-            <div className="flex items-center gap-3">
-              {saveSuccess && (
-                <span className="text-xs text-green-600 tracking-wide">✓ נשמר</span>
-              )}
-              <button
-                onClick={onCancel}
-                disabled={!hasChanges}
-                className="px-4 py-1.5 text-xs tracking-widest uppercase text-[#5C3D2E] border border-[#5C3D2E]/20 hover:border-[#5C3D2E]/50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                ביטול
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={!hasChanges || saving}
-                className="px-4 py-1.5 text-xs tracking-widest uppercase bg-[#5C3D2E] text-[#F5F0E8] hover:bg-[#3D2519] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                {saving ? 'שומר...' : saveLabel}
-              </button>
-            </div>
-          )}
-        </header>
-
-        {/* Tab content */}
-        <main className="flex-1 p-6 overflow-y-auto">
-          {children}
-        </main>
-      </div>
+      {/* Tab content */}
+      <main className="flex-1 p-6 overflow-y-auto overscroll-contain">
+        {children}
+      </main>
 
       {dialogPendingHref && (
         <UnsavedDialog onStay={handleDialogStay} onLeave={handleDialogLeave} />

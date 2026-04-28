@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
@@ -55,12 +55,34 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel, rtl }: Ligh
     return () => document.removeEventListener('keydown', onKey)
   }, [onClose, goLeft, goRight])
 
+  const touchStartX = useRef<number | null>(null)
+  const touchStartY = useRef<number | null>(null)
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+    touchStartY.current = e.touches[0].clientY
+  }, [])
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return
+    const dx = e.changedTouches[0].clientX - touchStartX.current
+    const dy = e.changedTouches[0].clientY - touchStartY.current
+    touchStartX.current = null
+    touchStartY.current = null
+    // Ignore if not clearly horizontal or too short
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return
+    if (dx < 0) next()
+    else prev()
+  }, [next, prev])
+
   return (
     <div
-      className="fixed inset-0 z-50 bg-black flex flex-col animate-lightbox-in"
+      className="fixed inset-0 z-50 bg-black flex flex-col animate-lightbox-in touch-pan-y"
       role="dialog"
       aria-modal="true"
       aria-label={item.title}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Top bar — fixed height */}
       <div className="h-14 flex items-center justify-between px-6 shrink-0" onClick={e => e.stopPropagation()}>

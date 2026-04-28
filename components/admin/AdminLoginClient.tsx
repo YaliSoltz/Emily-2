@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Image from 'next/image'
+import { Eye, EyeOff } from 'lucide-react'
 
 type View = 'login' | 'reset' | 'reset-sent'
 
@@ -16,6 +17,8 @@ export default function AdminLoginClient() {
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
   const [loginLoading, setLoginLoading] = useState(false)
+
+  const [showPassword, setShowPassword] = useState(false)
 
   // Reset state
   const [resetEmail, setResetEmail] = useState('')
@@ -86,7 +89,7 @@ export default function AdminLoginClient() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF7F2] flex flex-col items-center justify-center px-6">
+    <div className="min-h-dvh bg-[#FAF7F2] flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-sm">
         <div className="flex justify-center mb-10">
           <Image src="/images/logo.svg" alt="Emily Tal" width={160} height={50} className="h-10 w-auto" />
@@ -118,14 +121,24 @@ export default function AdminLoginClient() {
                   <label className="text-xs tracking-widest uppercase text-[#5C3D2E]/50 block mb-1.5">
                     סיסמה
                   </label>
-                  <input
-                    type="password"
-                    required
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    className="w-full border-b border-[#5C3D2E]/20 py-2 text-sm text-[#3D2519] focus:outline-none focus:border-[#5C3D2E] transition-colors bg-transparent"
-                    placeholder="••••••••"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      value={password}
+                      onChange={e => setPassword(e.target.value)}
+                      className="w-full border-b border-[#5C3D2E]/20 py-2 pe-7 text-sm text-[#3D2519] focus:outline-none focus:border-[#5C3D2E] transition-colors bg-transparent"
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(v => !v)}
+                      className="absolute inset-y-0 end-0 flex items-center text-[#5C3D2E]/35 hover:text-[#5C3D2E] transition-colors"
+                      aria-label={showPassword ? 'הסתר סיסמה' : 'הצג סיסמה'}
+                    >
+                      {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                    </button>
+                  </div>
                 </div>
                 {loginError && (
                   <p role="alert" className="text-red-600 text-xs text-center">{loginError}</p>

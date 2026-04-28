@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Send reset email
-  const redirectTo = `${request.nextUrl.origin}/auth/callback?next=/admin/settings`
+  const redirectTo = `${request.nextUrl.origin}/auth/callback?next=/adminresetpassword`
   const anonClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!

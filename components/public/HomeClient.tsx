@@ -42,7 +42,6 @@ export default function HomeClient({ heContent, enContent, galleryPreview }: Hom
           </p>
           <NavLink
             href="/gallery"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
             className="inline-flex items-center gap-3 bg-[#5C3D2E] text-[#F5F0E8] px-8 py-3.5 text-xs tracking-[0.2em] uppercase hover:bg-[#3D2519] transition-colors duration-200"
           >
             {c.hero_cta ?? (lang === 'he' ? 'צפייה בעבודות' : 'View Work')}
@@ -76,7 +75,7 @@ export default function HomeClient({ heContent, enContent, galleryPreview }: Hom
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {galleryPreview.map(item => (
-                <NavLink key={item.id} href={`/gallery?open=${item.id}`} onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
+                <NavLink key={item.id} href={`/gallery?open=${item.id}`}>
                   <div className="aspect-square bg-[#E8E0D5] overflow-hidden group relative">
                     {item.image_url ? (
                       <Image
@@ -98,7 +97,6 @@ export default function HomeClient({ heContent, enContent, galleryPreview }: Hom
             <div className="text-center mt-10">
               <NavLink
                 href="/gallery"
-                onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
                 className="inline-flex items-center gap-2 text-sm text-[#5C3D2E] border-b border-[#5C3D2E]/40 pb-0.5 hover:border-[#5C3D2E] transition-colors tracking-widest uppercase"
               >
                 {lang === 'he' ? 'לכל העבודות' : 'View All Works'}
@@ -122,7 +120,6 @@ export default function HomeClient({ heContent, enContent, galleryPreview }: Hom
           </p>
           <NavLink
             href="/contact"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
             className="inline-flex items-center gap-3 border border-[#F5F0E8]/60 text-[#F5F0E8] px-8 py-3.5 text-xs tracking-[0.2em] uppercase hover:bg-[#F5F0E8] hover:text-[#5C3D2E] transition-colors duration-200"
           >
             {lang === 'he' ? 'יצירת קשר' : 'Get in Touch'}

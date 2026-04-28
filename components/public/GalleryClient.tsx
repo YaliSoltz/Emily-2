@@ -127,6 +127,11 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
         <p className="font-[family-name:var(--font-cormorant)] text-white/95 text-xl font-light tracking-wide">
           {item.title}
         </p>
+        {item.description && (
+          <p className="mt-2 text-white/60 text-xs leading-relaxed max-w-lg mx-auto">
+            {item.description}
+          </p>
+        )}
       </div>
     </div>
   )

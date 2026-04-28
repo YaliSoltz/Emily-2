@@ -28,9 +28,10 @@ interface LightboxProps {
   onClose: () => void
   onNavigate: (item: GalleryItem) => void
   categoryLabel: (cat: string) => string
+  rtl: boolean
 }
 
-function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxProps) {
+function Lightbox({ item, items, onClose, onNavigate, categoryLabel, rtl }: LightboxProps) {
   const idx = items.findIndex(i => i.id === item.id)
   const hasPrev = idx > 0
   const hasNext = idx < items.length - 1
@@ -38,15 +39,21 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
   const prev = useCallback(() => { if (hasPrev) onNavigate(items[idx - 1]) }, [idx, items, hasPrev, onNavigate])
   const next = useCallback(() => { if (hasNext) onNavigate(items[idx + 1]) }, [idx, items, hasNext, onNavigate])
 
+  // In RTL: left = forward (next), right = backward (prev)
+  const goLeft  = rtl ? next : prev
+  const goRight = rtl ? prev : next
+  const showLeft  = rtl ? hasNext : hasPrev
+  const showRight = rtl ? hasPrev : hasNext
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
-      if (e.key === 'ArrowLeft') prev()
-      if (e.key === 'ArrowRight') next()
+      if (e.key === 'ArrowLeft') goLeft()
+      if (e.key === 'ArrowRight') goRight()
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [onClose, prev, next])
+  }, [onClose, goLeft, goRight])
 
   return (
     <div
@@ -72,9 +79,9 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
 
       {/* Image area */}
       <div className="flex-1 flex items-center justify-center px-16 min-h-0 relative">
-        {hasPrev && (
+        {showLeft && (
           <button
-            onClick={e => { e.stopPropagation(); prev() }}
+            onClick={e => { e.stopPropagation(); goLeft() }}
             className="absolute left-2 top-1/2 -translate-y-1/2 text-white/65 hover:text-white transition-colors duration-200 p-3"
             aria-label="Previous"
           >
@@ -102,9 +109,9 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
           )}
         </div>
 
-        {hasNext && (
+        {showRight && (
           <button
-            onClick={e => { e.stopPropagation(); next() }}
+            onClick={e => { e.stopPropagation(); goRight() }}
             className="absolute right-2 top-1/2 -translate-y-1/2 text-white/65 hover:text-white transition-colors duration-200 p-3"
             aria-label="Next"
           >
@@ -273,6 +280,7 @@ export default function GalleryClient({ items }: GalleryClientProps) {
           onClose={() => setLightboxItem(null)}
           onNavigate={setLightboxItem}
           categoryLabel={categoryLabel}
+          rtl={lang === 'he'}
         />
       )}
     </div>

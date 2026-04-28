@@ -56,8 +56,8 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
       aria-modal="true"
       aria-label={item.title}
     >
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-6 py-4 shrink-0" onClick={e => e.stopPropagation()}>
+      {/* Top bar — fixed height */}
+      <div className="h-14 flex items-center justify-between px-6 shrink-0" onClick={e => e.stopPropagation()}>
         <span className="text-white/60 text-xs tracking-[0.2em] font-light">
           {String(idx + 1).padStart(2, '0')} / {String(items.length).padStart(2, '0')}
         </span>
@@ -113,25 +113,26 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
         )}
       </div>
 
-      {/* Caption */}
+      {/* Caption — fixed height so image area never shifts; scrollable if content is long */}
       <div
-        key={`caption-${item.id}`}
-        className="shrink-0 px-6 py-5 text-center animate-lightbox-image"
+        className="h-44 shrink-0 overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
-        {item.category && (
-          <p className="text-white/55 text-[10px] tracking-[0.25em] uppercase mb-2">
-            {categoryLabel(item.category)}
+        <div key={`caption-${item.id}`} className="px-6 py-4 text-center animate-lightbox-image">
+          {item.category && (
+            <p className="text-white/55 text-[10px] tracking-[0.25em] uppercase mb-2">
+              {categoryLabel(item.category)}
+            </p>
+          )}
+          <p className="font-[family-name:var(--font-cormorant)] text-white/95 text-xl font-light tracking-wide">
+            {item.title}
           </p>
-        )}
-        <p className="font-[family-name:var(--font-cormorant)] text-white/95 text-xl font-light tracking-wide">
-          {item.title}
-        </p>
-        {item.description && (
-          <p className="mt-2 text-white/60 text-xs leading-relaxed max-w-lg mx-auto">
-            {item.description}
-          </p>
-        )}
+          {item.description && (
+            <p className="mt-2 text-white/60 text-xs leading-relaxed max-w-lg mx-auto">
+              {item.description}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   )

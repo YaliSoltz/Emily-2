@@ -41,8 +41,8 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
-      if (e.key === 'ArrowLeft') next()
-      if (e.key === 'ArrowRight') prev()
+      if (e.key === 'ArrowLeft') prev()
+      if (e.key === 'ArrowRight') next()
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
@@ -75,7 +75,7 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
         {hasPrev && (
           <button
             onClick={e => { e.stopPropagation(); prev() }}
-            className="absolute start-2 top-1/2 -translate-y-1/2 text-white/65 hover:text-white transition-colors duration-200 p-3"
+            className="absolute left-2 top-1/2 -translate-y-1/2 text-white/65 hover:text-white transition-colors duration-200 p-3"
             aria-label="Previous"
           >
             <ChevronLeft size={32} strokeWidth={1} />
@@ -105,7 +105,7 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel }: LightboxP
         {hasNext && (
           <button
             onClick={e => { e.stopPropagation(); next() }}
-            className="absolute end-2 top-1/2 -translate-y-1/2 text-white/65 hover:text-white transition-colors duration-200 p-3"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-white/65 hover:text-white transition-colors duration-200 p-3"
             aria-label="Next"
           >
             <ChevronRight size={32} strokeWidth={1} />

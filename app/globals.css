@@ -87,6 +87,15 @@ textarea:focus-visible {
   border-bottom-color: #5C3D2E !important;
 }
 
+/* ── Gallery filter animation ────────────────────────────── */
+@keyframes galleryItemIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-gallery-item {
+  animation: galleryItemIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
 /* ── Lightbox animations ──────────────────────────────────── */
 @keyframes lightboxIn {
   from { opacity: 0; }

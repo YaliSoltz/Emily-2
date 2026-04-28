@@ -22,7 +22,7 @@ function ShellInner({ children, contactInfo, socialLinks }: Props) {
         {lang === 'he' ? 'דלג לתוכן הראשי' : 'Skip to main content'}
       </a>
       <Header lang={lang} onLangChange={setLang} />
-      <main id="main-content" className="flex-1 pt-16">
+      <main id="main-content" className="flex-1">
         {children}
       </main>
       <Footer lang={lang} contactInfo={contactInfo} socialLinks={socialLinks} />

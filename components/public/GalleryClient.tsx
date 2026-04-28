@@ -243,12 +243,13 @@ export default function GalleryClient({ items }: GalleryClientProps) {
             {lang === 'he' ? 'עבודות יתווספו בקרוב' : 'Works coming soon'}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {filtered.map(item => (
+          <div key={activeCategory} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {filtered.map((item, i) => (
               <button
                 key={item.id}
                 onClick={() => setLightboxItem(item)}
-                className="group text-start bg-white border border-[#5C3D2E]/8 hover:border-[#5C3D2E]/18 hover:shadow-[0_4px_24px_rgba(92,61,46,0.10)] transition-all duration-300 overflow-hidden rounded-[10px]"
+                style={{ animationDelay: `${Math.min(i * 50, 350)}ms` }}
+                className="animate-gallery-item group text-start bg-white border border-[#5C3D2E]/8 hover:border-[#5C3D2E]/18 hover:shadow-[0_4px_24px_rgba(92,61,46,0.10)] transition-all duration-300 overflow-hidden rounded-[10px]"
               >
                 {/* Image */}
                 <div className="relative aspect-[4/3] bg-[#E8E0D5] overflow-hidden">

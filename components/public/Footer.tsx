@@ -8,8 +8,30 @@ interface FooterProps {
 }
 
 const text = {
-  he: { rights: 'כל הזכויות שמורות', design: 'עיצוב טקסטיל, סריגה, הדפסי רשת', terms: 'תקנון', accessibility: 'נגישות', privacy: 'פרטיות' },
-  en: { rights: 'All rights reserved', design: 'Textile Design, Knitting, Screen Printing', terms: 'Terms', accessibility: 'Accessibility', privacy: 'Privacy' },
+  he: {
+    rights: 'כל הזכויות שמורות',
+    design: 'עיצוב טקסטיל, סריגה, הדפסי רשת',
+    terms: 'תקנון', accessibility: 'נגישות', privacy: 'פרטיות',
+    nav: 'ניווט',
+    links: [
+      { href: '/', label: 'בית' },
+      { href: '/about', label: 'אודות' },
+      { href: '/gallery', label: 'גלריה' },
+      { href: '/contact', label: 'יצירת קשר' },
+    ],
+  },
+  en: {
+    rights: 'All rights reserved',
+    design: 'Textile Design, Knitting, Screen Printing',
+    terms: 'Terms', accessibility: 'Accessibility', privacy: 'Privacy',
+    nav: 'Navigation',
+    links: [
+      { href: '/', label: 'Home' },
+      { href: '/about', label: 'About' },
+      { href: '/gallery', label: 'Gallery' },
+      { href: '/contact', label: 'Contact' },
+    ],
+  },
 }
 
 export default function Footer({ lang, contactInfo, socialLinks }: FooterProps) {
@@ -28,6 +50,20 @@ export default function Footer({ lang, contactInfo, socialLinks }: FooterProps) 
             <p className="text-[#F5F0E8]/60 text-xs tracking-widest mt-1 uppercase">
               {t.design}
             </p>
+          </div>
+
+          {/* Nav */}
+          <div className="flex flex-col gap-3">
+            <p className="text-xs tracking-[0.2em] uppercase text-[#F5F0E8]/40 mb-1">{t.nav}</p>
+            {t.links.map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm text-[#F5F0E8]/70 hover:text-[#F5F0E8] transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
 
           {/* Contact */}

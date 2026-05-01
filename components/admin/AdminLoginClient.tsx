@@ -233,7 +233,7 @@ export default function AdminLoginClient() {
             href="/"
             className="text-xs text-[#5C3D2E]/35 hover:text-[#5C3D2E] transition-colors tracking-wider"
           >
-            ← חזרה לאתר
+            חזרה לאתר ←
           </a>
         </div>
       </div>

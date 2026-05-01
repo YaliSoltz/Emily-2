@@ -130,6 +130,7 @@ export async function POST(request: NextRequest) {
   })
 
   if (error) {
+    console.error('[contact] supabase insert error:', error)
     return NextResponse.json({ error: 'Failed to save message' }, { status: 500 })
   }
 

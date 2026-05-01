@@ -19,12 +19,10 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
 
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
-  const [errorMsg, setErrorMsg] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setStatus('loading')
-    setErrorMsg('')
 
     try {
       const res = await fetch('/api/contact', {
@@ -32,13 +30,11 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
+      if (!res.ok) throw new Error()
       setStatus('success')
       setForm({ name: '', email: '', phone: '', message: '' })
-    } catch (err: unknown) {
+    } catch {
       setStatus('error')
-      setErrorMsg(err instanceof Error ? err.message : 'Error')
     }
   }
 
@@ -135,7 +131,11 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
                 />
               </div>
               {status === 'error' && (
-                <p role="alert" className="text-red-600 text-xs">{errorMsg}</p>
+                <p role="alert" className="text-red-600 text-xs">
+                  {lang === 'he'
+                    ? 'אירעה שגיאה בשליחת ההודעה. אנא נסו שנית.'
+                    : 'An error occurred while sending your message. Please try again.'}
+                </p>
               )}
               <p className="text-[10px] text-[#5C3D2E]/40 leading-relaxed">
                 {lang === 'he'

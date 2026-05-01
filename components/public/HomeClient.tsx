@@ -27,7 +27,7 @@ export default function HomeClient({ heContent, enContent, galleryPreview }: Hom
   return (
     <div>
       {/* Hero */}
-      <section className="min-h-dvh flex flex-col items-center justify-center text-center px-6 bg-[#FAF7F2]">
+      <section className="min-h-[100svh] flex flex-col items-center justify-center text-center px-6 bg-[#FAF7F2]">
         <div className="animate-fade-in-up max-w-2xl">
           <p className="text-xs tracking-[0.3em] uppercase text-[#5C3D2E]/50 mb-6">
             {lang === 'he' ? 'תיק עבודות' : 'Portfolio'}

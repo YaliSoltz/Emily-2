@@ -228,9 +228,14 @@ export default function AdminLoginClient() {
 
         </div>
 
-        <p className="text-center text-xs text-[#5C3D2E]/30 mt-6 tracking-wider">
-          ממשק ניהול — Emily Tal Portfolio
-        </p>
+        <div className="mt-6 text-center">
+          <a
+            href="/"
+            className="text-xs text-[#5C3D2E]/35 hover:text-[#5C3D2E] transition-colors tracking-wider"
+          >
+            ← חזרה לאתר
+          </a>
+        </div>
       </div>
     </div>
   )

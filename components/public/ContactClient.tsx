@@ -6,23 +6,26 @@ import { Mail, Phone } from 'lucide-react'
 import Link from 'next/link'
 import { SocialIcon, platformLabel } from '@/lib/social-platforms'
 
-const ERROR_MESSAGES: Record<string, { he: string; en: string }> = {
-  'Invalid phone number': {
-    he: 'מספר הטלפון אינו תקין. יש להזין ספרות בלבד, לדוגמה: 050-0000000.',
-    en: 'Invalid phone number. Please use digits only, e.g. 050-0000000.',
-  },
-  'Invalid email': {
-    he: 'כתובת האימייל אינה תקינה.',
-    en: 'Please enter a valid email address.',
-  },
+const PHONE_REGEX = /^[+\d\s\-().]{7,20}$/
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+const FIELD_ERRORS = {
+  required:      { he: 'שדה חובה',                                                            en: 'This field is required' },
+  invalidEmail:  { he: 'כתובת האימייל אינה תקינה',                                           en: 'Please enter a valid email address' },
+  invalidPhone:  { he: 'מספר טלפון אינו תקין. יש להזין ספרות בלבד, לדוגמה: 050-0000000.',  en: 'Invalid phone number. Please use digits only, e.g. 050-0000000.' },
+}
+
+const API_ERRORS: Record<string, { he: string; en: string }> = {
+  'Invalid phone number': FIELD_ERRORS.invalidPhone,
+  'Invalid email':        FIELD_ERRORS.invalidEmail,
   'Too many requests': {
     he: 'יותר מדי ניסיונות שליחה. אנא המתינו דקה ונסו שנית.',
     en: 'Too many attempts. Please wait a minute and try again.',
   },
 }
 
-function contactErrorMessage(key: string, lang: 'he' | 'en'): string {
-  return ERROR_MESSAGES[key]?.[lang] ?? (lang === 'he'
+function apiErrorMessage(key: string, lang: 'he' | 'en'): string {
+  return API_ERRORS[key]?.[lang] ?? (lang === 'he'
     ? 'אירעה שגיאה בשליחת ההודעה. אנא נסו שנית.'
     : 'An error occurred while sending your message. Please try again.')
 }
@@ -41,9 +44,53 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorKey, setErrorKey] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof typeof form, string>>>({})
+
+  const validateField = (field: keyof typeof form, value: string): string => {
+    switch (field) {
+      case 'name':
+        return value.trim() ? '' : FIELD_ERRORS.required[lang]
+      case 'email':
+        if (!value.trim()) return FIELD_ERRORS.required[lang]
+        if (!EMAIL_REGEX.test(value)) return FIELD_ERRORS.invalidEmail[lang]
+        return ''
+      case 'phone':
+        if (value.trim() && !PHONE_REGEX.test(value.trim())) return FIELD_ERRORS.invalidPhone[lang]
+        return ''
+      case 'message':
+        return value.trim() ? '' : FIELD_ERRORS.required[lang]
+    }
+  }
+
+  const validateAll = (): Partial<Record<keyof typeof form, string>> => {
+    const errors: Partial<Record<keyof typeof form, string>> = {}
+    for (const key of Object.keys(form) as (keyof typeof form)[]) {
+      const err = validateField(key, form[key])
+      if (err) errors[key] = err
+    }
+    return errors
+  }
+
+  const handleChange = (field: keyof typeof form, value: string) => {
+    setForm(f => ({ ...f, [field]: value }))
+    if (fieldErrors[field]) {
+      setFieldErrors(prev => { const next = { ...prev }; delete next[field]; return next })
+    }
+  }
+
+  const handleBlur = (field: keyof typeof form) => {
+    const err = validateField(field, form[field])
+    setFieldErrors(prev => err ? { ...prev, [field]: err } : (({ [field]: _, ...rest }) => rest)(prev))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const errors = validateAll()
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+
     setStatus('loading')
     setErrorKey('')
 
@@ -61,10 +108,16 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
       }
       setStatus('success')
       setForm({ name: '', email: '', phone: '', message: '' })
+      setFieldErrors({})
     } catch {
       setStatus('error')
     }
   }
+
+  const inputClass = (field: keyof typeof form) =>
+    `w-full bg-transparent border-b py-2 text-[#3D2519] focus:outline-none transition-colors placeholder:text-[#5C3D2E]/30 text-sm ${
+      fieldErrors[field] ? 'border-red-500' : 'border-[#5C3D2E]/30 focus:border-[#5C3D2E]'
+    }`
 
   return (
     <div className="min-h-screen bg-[#FAF7F2]">
@@ -100,75 +153,111 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
               <p className="text-[10px] text-[#5C3D2E]/40 tracking-wide">
                 <span aria-hidden="true" className="text-[#B03A2E]">* </span>
                 {lang === 'he' ? 'שדות חובה' : 'Required fields'}
               </p>
+
+              {/* Name */}
               <div>
-                <label className="text-xs tracking-[0.2em] uppercase text-[#5C3D2E]/60 block mb-1.5">
+                <label htmlFor="contact-name" className="text-xs tracking-[0.2em] uppercase text-[#5C3D2E]/60 block mb-1.5">
                   {c.name_label ?? (lang === 'he' ? 'שם' : 'Name')}
                   <span aria-hidden="true" className="text-[#B03A2E] ms-1">*</span>
                 </label>
                 <input
+                  id="contact-name"
                   type="text"
-                  required
+                  aria-required="true"
+                  aria-describedby={fieldErrors.name ? 'err-name' : undefined}
                   value={form.name}
-                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                  className="w-full bg-transparent border-b border-[#5C3D2E]/30 py-2 text-[#3D2519] focus:outline-none focus:border-[#5C3D2E] transition-colors placeholder:text-[#5C3D2E]/30 text-sm"
+                  onChange={e => handleChange('name', e.target.value)}
+                  onBlur={() => handleBlur('name')}
+                  className={inputClass('name')}
                 />
+                {fieldErrors.name && (
+                  <p id="err-name" role="alert" className="mt-1 text-xs text-red-600">{fieldErrors.name}</p>
+                )}
               </div>
+
+              {/* Email */}
               <div>
-                <label className="text-xs tracking-[0.2em] uppercase text-[#5C3D2E]/60 block mb-1.5">
+                <label htmlFor="contact-email" className="text-xs tracking-[0.2em] uppercase text-[#5C3D2E]/60 block mb-1.5">
                   {c.email_label ?? (lang === 'he' ? 'אימייל' : 'Email')}
                   <span aria-hidden="true" className="text-[#B03A2E] ms-1">*</span>
                 </label>
                 <input
+                  id="contact-email"
                   type="email"
-                  required
+                  aria-required="true"
+                  aria-describedby={fieldErrors.email ? 'err-email' : undefined}
                   value={form.email}
-                  onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                  className="w-full bg-transparent border-b border-[#5C3D2E]/30 py-2 text-[#3D2519] focus:outline-none focus:border-[#5C3D2E] transition-colors placeholder:text-[#5C3D2E]/30 text-sm"
+                  onChange={e => handleChange('email', e.target.value)}
+                  onBlur={() => handleBlur('email')}
+                  className={inputClass('email')}
                 />
+                {fieldErrors.email && (
+                  <p id="err-email" role="alert" className="mt-1 text-xs text-red-600">{fieldErrors.email}</p>
+                )}
               </div>
+
+              {/* Phone */}
               <div>
-                <label className="text-xs tracking-[0.2em] uppercase text-[#5C3D2E]/60 block mb-1.5">
+                <label htmlFor="contact-phone" className="text-xs tracking-[0.2em] uppercase text-[#5C3D2E]/60 block mb-1.5">
                   {lang === 'he' ? 'טלפון' : 'Phone'}
                   <span className="text-[#5C3D2E]/35 ms-2 normal-case tracking-normal">
                     {lang === 'he' ? '(אופציונלי)' : '(optional)'}
                   </span>
                 </label>
                 <input
+                  id="contact-phone"
                   type="tel"
+                  aria-describedby={fieldErrors.phone ? 'err-phone' : undefined}
                   value={form.phone}
-                  onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-                  className="w-full bg-transparent border-b border-[#5C3D2E]/30 py-2 text-[#3D2519] focus:outline-none focus:border-[#5C3D2E] transition-colors placeholder:text-[#5C3D2E]/30 text-sm"
+                  onChange={e => handleChange('phone', e.target.value)}
+                  onBlur={() => handleBlur('phone')}
+                  className={inputClass('phone')}
                 />
+                {fieldErrors.phone && (
+                  <p id="err-phone" role="alert" className="mt-1 text-xs text-red-600">{fieldErrors.phone}</p>
+                )}
               </div>
+
+              {/* Message */}
               <div>
-                <label className="text-xs tracking-[0.2em] uppercase text-[#5C3D2E]/60 block mb-1.5">
+                <label htmlFor="contact-message" className="text-xs tracking-[0.2em] uppercase text-[#5C3D2E]/60 block mb-1.5">
                   {c.message_label ?? (lang === 'he' ? 'הודעה' : 'Message')}
                   <span aria-hidden="true" className="text-[#B03A2E] ms-1">*</span>
                 </label>
                 <textarea
-                  required
+                  id="contact-message"
+                  aria-required="true"
+                  aria-describedby={fieldErrors.message ? 'err-message' : undefined}
                   rows={5}
                   value={form.message}
-                  onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
-                  className="w-full bg-transparent border-b border-[#5C3D2E]/30 py-2 text-[#3D2519] focus:outline-none focus:border-[#5C3D2E] transition-colors placeholder:text-[#5C3D2E]/30 text-sm resize-none"
+                  onChange={e => handleChange('message', e.target.value)}
+                  onBlur={() => handleBlur('message')}
+                  className={inputClass('message')}
                 />
+                {fieldErrors.message && (
+                  <p id="err-message" role="alert" className="mt-1 text-xs text-red-600">{fieldErrors.message}</p>
+                )}
               </div>
+
+              {/* API-level error */}
               {status === 'error' && (
                 <p role="alert" className="text-red-600 text-xs">
-                  {contactErrorMessage(errorKey, lang)}
+                  {apiErrorMessage(errorKey, lang)}
                 </p>
               )}
+
               <p className="text-[10px] text-[#5C3D2E]/40 leading-relaxed">
                 {lang === 'he'
                   ? <>פרטיך ישמשו אך ורק למענה לפנייתך ויישמרו עד 24 חודשים. <Link href="/privacy" className="underline hover:text-[#5C3D2E]/70 transition-colors">מדיניות פרטיות</Link></>
                   : <>Your details will be used solely to respond to your inquiry and retained for up to 24 months. <Link href="/privacy" className="underline hover:text-[#5C3D2E]/70 transition-colors">Privacy Policy</Link></>
                 }
               </p>
+
               <button
                 type="submit"
                 disabled={status === 'loading'}

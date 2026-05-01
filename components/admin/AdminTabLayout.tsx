@@ -67,9 +67,9 @@ export default function AdminTabLayout({
   }
 
   return (
-    <div className="md:mr-56 flex flex-col h-dvh">
-      {/* Header — stays put because main scrolls internally, not the body */}
-      <header className="flex-shrink-0 z-20 bg-white border-b border-[#5C3D2E]/10 px-6 h-14 flex items-center justify-between md:mt-0 mt-12">
+    <div className="fixed inset-0 top-12 md:top-0 md:right-56 flex flex-col">
+      {/* Header */}
+      <header className="flex-shrink-0 z-20 bg-white border-b border-[#5C3D2E]/10 px-6 h-14 flex items-center justify-between">
         <h1 className="text-sm tracking-widest uppercase text-[#3D2519] font-medium">{title}</h1>
 
         {!hideSaveCancel && (

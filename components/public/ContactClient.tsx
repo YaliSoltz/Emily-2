@@ -6,6 +6,27 @@ import { Mail, Phone } from 'lucide-react'
 import Link from 'next/link'
 import { SocialIcon, platformLabel } from '@/lib/social-platforms'
 
+const ERROR_MESSAGES: Record<string, { he: string; en: string }> = {
+  'Invalid phone number': {
+    he: 'מספר הטלפון אינו תקין. יש להזין ספרות בלבד, לדוגמה: 050-0000000.',
+    en: 'Invalid phone number. Please use digits only, e.g. 050-0000000.',
+  },
+  'Invalid email': {
+    he: 'כתובת האימייל אינה תקינה.',
+    en: 'Please enter a valid email address.',
+  },
+  'Too many requests': {
+    he: 'יותר מדי ניסיונות שליחה. אנא המתינו דקה ונסו שנית.',
+    en: 'Too many attempts. Please wait a minute and try again.',
+  },
+}
+
+function contactErrorMessage(key: string, lang: 'he' | 'en'): string {
+  return ERROR_MESSAGES[key]?.[lang] ?? (lang === 'he'
+    ? 'אירעה שגיאה בשליחת ההודעה. אנא נסו שנית.'
+    : 'An error occurred while sending your message. Please try again.')
+}
+
 interface ContactClientProps {
   heContent: Record<string, string>
   enContent: Record<string, string>
@@ -19,10 +40,12 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
 
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [errorKey, setErrorKey] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setStatus('loading')
+    setErrorKey('')
 
     try {
       const res = await fetch('/api/contact', {
@@ -30,7 +53,12 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       })
-      if (!res.ok) throw new Error()
+      const data = await res.json()
+      if (!res.ok) {
+        setErrorKey(data.error ?? '')
+        setStatus('error')
+        return
+      }
       setStatus('success')
       setForm({ name: '', email: '', phone: '', message: '' })
     } catch {
@@ -132,9 +160,7 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
               </div>
               {status === 'error' && (
                 <p role="alert" className="text-red-600 text-xs">
-                  {lang === 'he'
-                    ? 'אירעה שגיאה בשליחת ההודעה. אנא נסו שנית.'
-                    : 'An error occurred while sending your message. Please try again.'}
+                  {contactErrorMessage(errorKey, lang)}
                 </p>
               )}
               <p className="text-[10px] text-[#5C3D2E]/40 leading-relaxed">

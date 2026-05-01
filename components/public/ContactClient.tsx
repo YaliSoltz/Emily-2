@@ -5,18 +5,18 @@ import { useLang } from './LangProvider'
 import { Mail, Phone } from 'lucide-react'
 import Link from 'next/link'
 import { SocialIcon, platformLabel } from '@/lib/social-platforms'
+import { isValidIsraeliPhone } from '@/lib/phone-validation'
 
-const PHONE_REGEX = /^[+\d\s\-().]{7,20}$/
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const FIELD_ERRORS = {
-  required:      { he: 'שדה חובה',                                                            en: 'This field is required' },
-  invalidEmail:  { he: 'כתובת האימייל אינה תקינה',                                           en: 'Please enter a valid email address' },
-  invalidPhone:  { he: 'מספר טלפון אינו תקין. יש להזין ספרות בלבד, לדוגמה: 050-0000000.',  en: 'Invalid phone number. Please use digits only, e.g. 050-0000000.' },
+  required:      { he: 'שדה חובה',                                                                         en: 'This field is required' },
+  invalidEmail:  { he: 'כתובת האימייל אינה תקינה',                                                        en: 'Please enter a valid email address' },
+  invalidPhone:  { he: 'מספר טלפון ישראלי אינו תקין. לדוגמה: 050-1234567 או 03-1234567.',                en: 'Please enter a valid Israeli phone number, e.g. 050-1234567 or 03-1234567.' },
 }
 
 const API_ERRORS: Record<string, { he: string; en: string }> = {
-  'Invalid phone number': FIELD_ERRORS.invalidPhone,
+  'Invalid phone number':  FIELD_ERRORS.invalidPhone,
   'Invalid email':        FIELD_ERRORS.invalidEmail,
   'Too many requests': {
     he: 'יותר מדי ניסיונות שליחה. אנא המתינו דקה ונסו שנית.',
@@ -55,7 +55,7 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
         if (!EMAIL_REGEX.test(value)) return FIELD_ERRORS.invalidEmail[lang]
         return ''
       case 'phone':
-        if (value.trim() && !PHONE_REGEX.test(value.trim())) return FIELD_ERRORS.invalidPhone[lang]
+        if (value.trim() && !isValidIsraeliPhone(value)) return FIELD_ERRORS.invalidPhone[lang]
         return ''
       case 'message':
         return value.trim() ? '' : FIELD_ERRORS.required[lang]

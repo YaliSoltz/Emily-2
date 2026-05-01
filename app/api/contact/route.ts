@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { getResend } from '@/lib/resend'
+import { isValidIsraeliPhone } from '@/lib/phone-validation'
 import { NextRequest, NextResponse } from 'next/server'
 
 const rateLimitMap = new Map<string, number[]>()
@@ -120,8 +121,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid email' }, { status: 400 })
   }
 
-  const phoneRegex = /^[+\d\s\-().]{7,20}$/
-  if (phone?.trim() && !phoneRegex.test(phone.trim())) {
+  if (phone?.trim() && !isValidIsraeliPhone(phone)) {
     return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 })
   }
 

@@ -40,7 +40,7 @@ export default function AdminModal({ title, onClose, children, footer, width = '
         </div>
 
         {/* Scrollable content */}
-        <div className="overflow-y-auto flex-1 p-6">
+        <div className="overflow-y-auto flex-1 min-h-0 p-6">
           {children}
         </div>
 

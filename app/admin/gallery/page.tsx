@@ -6,7 +6,8 @@ import {
   DndContext,
   closestCenter,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   type DragEndEvent,
@@ -57,17 +58,17 @@ function SortableGalleryItem({ item, onEdit, onDelete }: SortableItemProps) {
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`group relative bg-white border border-[#5C3D2E]/10 overflow-hidden ${isDragging ? 'opacity-40 shadow-xl z-50' : ''}`}
+      className={`group relative bg-white border border-[#5C3D2E]/10 overflow-hidden cursor-grab active:cursor-grabbing select-none ${isDragging ? 'opacity-40 shadow-xl z-50' : ''}`}
+      {...attributes}
+      {...listeners}
     >
-      {/* Drag handle */}
-      <button
-        {...attributes}
-        {...listeners}
-        className="absolute top-2 right-2 z-10 bg-white/90 text-[#5C3D2E]/40 hover:text-[#5C3D2E] p-1.5 cursor-grab active:cursor-grabbing touch-none transition-colors"
-        aria-label="גרור לשינוי סדר"
+      {/* Drag handle — visual indicator only */}
+      <div
+        className="absolute top-2 right-2 z-10 bg-white/90 text-[#5C3D2E]/40 p-1.5 pointer-events-none"
+        aria-hidden="true"
       >
         <GripVertical size={12} />
-      </button>
+      </div>
 
       <div className="aspect-square bg-[#E8E0D5] relative">
         {item.image_url ? (
@@ -86,16 +87,22 @@ function SortableGalleryItem({ item, onEdit, onDelete }: SortableItemProps) {
         </p>
       </div>
 
-      {/* Edit / Delete — visible on hover */}
-      <div className="absolute top-2 left-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      {/* Edit / Delete — always visible on mobile, hover-reveal on desktop */}
+      <div className="absolute top-2 left-2 flex gap-1 z-10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
         <button
+          onMouseDown={e => e.stopPropagation()}
+          onTouchStart={e => e.stopPropagation()}
           onClick={() => onEdit(item)}
+          aria-label="ערוך"
           className="bg-white/90 text-[#5C3D2E] p-1.5 hover:bg-[#5C3D2E] hover:text-white transition-colors"
         >
           <Pencil size={12} />
         </button>
         <button
+          onMouseDown={e => e.stopPropagation()}
+          onTouchStart={e => e.stopPropagation()}
           onClick={() => onDelete(item.id)}
+          aria-label="מחק"
           className="bg-white/90 text-red-500 p-1.5 hover:bg-red-500 hover:text-white transition-colors"
         >
           <Trash2 size={12} />
@@ -114,7 +121,8 @@ export default function AdminGalleryPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 

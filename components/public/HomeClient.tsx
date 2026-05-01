@@ -75,23 +75,20 @@ export default function HomeClient({ heContent, enContent, galleryPreview }: Hom
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {galleryPreview.map(item => (
-                <NavLink key={item.id} href={`/gallery?open=${item.id}`}>
-                  <div className="aspect-square bg-[#E8E0D5] overflow-hidden group relative">
-                    {item.image_url ? (
-                      <Image
-                        src={item.image_url}
-                        alt={item.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-[#5C3D2E]/30 text-xs tracking-widest uppercase">{item.category ?? 'Work'}</span>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-[#3D2519]/0 group-hover:bg-[#3D2519]/20 transition-colors duration-300" />
-                  </div>
-                </NavLink>
+                <div key={item.id} className="aspect-square bg-[#E8E0D5] overflow-hidden relative">
+                  {item.image_url ? (
+                    <Image
+                      src={item.image_url}
+                      alt={item.title}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-[#5C3D2E]/30 text-xs tracking-widest uppercase">{item.category ?? 'Work'}</span>
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
             <div className="text-center mt-10">

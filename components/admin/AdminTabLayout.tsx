@@ -96,7 +96,7 @@ export default function AdminTabLayout({
       </header>
 
       {/* Tab content */}
-      <main className="flex-1 p-6 overflow-y-auto overscroll-contain">
+      <main className="flex-1 min-h-0 p-6 overflow-y-auto overscroll-contain">
         {children}
       </main>
 

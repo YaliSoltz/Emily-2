@@ -64,15 +64,16 @@ export default function ImageUpload({ currentUrl, onUpload, onRemove, hint, fold
           {onRemove && (
             <button
               onClick={onRemove}
-              className="absolute top-2 left-2 bg-white/90 text-[#5C3D2E] p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-              title="הסר תמונה"
+              aria-label="הסר תמונה"
+              className="absolute top-2 left-2 bg-white/90 text-[#5C3D2E] p-1 rounded opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
             >
               <X size={14} />
             </button>
           )}
           <button
             onClick={() => inputRef.current?.click()}
-            className="absolute bottom-2 left-2 bg-white/90 text-[#5C3D2E] px-3 py-1 text-xs tracking-wide opacity-0 group-hover:opacity-100 transition-opacity"
+            aria-label="החלף תמונה"
+            className="absolute bottom-2 left-2 bg-white/90 text-[#5C3D2E] px-3 py-1 text-xs tracking-wide opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
           >
             החלף תמונה
           </button>

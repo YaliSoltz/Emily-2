@@ -25,11 +25,16 @@ export default function AdminTabLayout({
   hideSaveCancel = false,
 }: AdminTabLayoutProps) {
   const router = useRouter()
-  const { registerNavigateAway } = useAdminNav()
+  const { registerNavigateAway, setMobileTitle } = useAdminNav()
   const [saving, setSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [dialogPendingHref, setDialogPendingHref] = useState<string | null>(null)
   const pendingHrefRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    setMobileTitle(title)
+    return () => setMobileTitle('')
+  }, [title, setMobileTitle])
 
   const handleNavigateAway = useCallback((href: string): boolean => {
     pendingHrefRef.current = href
@@ -68,8 +73,8 @@ export default function AdminTabLayout({
 
   return (
     <div className="mt-12 md:mt-0 md:mr-56 h-[calc(100svh-3rem)] md:h-screen flex flex-col">
-      {/* Header */}
-      <header className="flex-shrink-0 z-20 bg-white border-b border-[#5C3D2E]/10 px-6 h-14 flex items-center justify-between">
+      {/* Header — desktop only */}
+      <header className="hidden md:flex flex-shrink-0 z-20 bg-white border-b border-[#5C3D2E]/10 px-6 h-14 items-center justify-between">
         <h1 className="text-sm tracking-widest uppercase text-[#3D2519] font-medium">{title}</h1>
 
         {!hideSaveCancel && (
@@ -99,6 +104,29 @@ export default function AdminTabLayout({
       <main className="flex-1 min-h-0 p-6 overflow-y-auto overscroll-contain">
         {children}
       </main>
+
+      {/* Save/cancel bar — mobile only, always visible */}
+      {!hideSaveCancel && (
+        <div className="md:hidden flex-shrink-0 bg-white border-t border-[#5C3D2E]/10 px-4 h-14 flex items-center justify-end gap-3">
+          {saveSuccess && (
+            <span className="text-xs text-green-600 tracking-wide">✓ נשמר</span>
+          )}
+          <button
+            onClick={onCancel}
+            disabled={!hasChanges}
+            className="px-4 py-1.5 text-xs tracking-widest uppercase text-[#5C3D2E] border border-[#5C3D2E]/20 hover:border-[#5C3D2E]/50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            ביטול
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={!hasChanges || saving}
+            className="px-4 py-1.5 text-xs tracking-widest uppercase bg-[#5C3D2E] text-[#F5F0E8] hover:bg-[#3D2519] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            {saving ? 'שומר...' : saveLabel}
+          </button>
+        </div>
+      )}
 
       {dialogPendingHref && (
         <UnsavedDialog onStay={handleDialogStay} onLeave={handleDialogLeave} />

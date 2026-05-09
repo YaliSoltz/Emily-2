@@ -27,17 +27,20 @@ interface NavContentProps {
   pathname: string
   onTabClick: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void
   onLogout: () => void
+  hideLogo?: boolean
 }
 
-function NavContent({ pathname, onTabClick, onLogout }: NavContentProps) {
+function NavContent({ pathname, onTabClick, onLogout, hideLogo = false }: NavContentProps) {
   return (
     <div className="flex flex-col h-full">
-      <div className="px-4 py-5 border-b border-[#5C3D2E]/10">
-        <p className="font-[family-name:var(--font-cormorant)] text-lg text-[#3D2519] tracking-widest">
-          EMILY TAL
-        </p>
-        <p className="text-[10px] text-[#5C3D2E]/40 tracking-widest uppercase mt-0.5">ממשק ניהול</p>
-      </div>
+      {!hideLogo && (
+        <div className="px-4 py-5 border-b border-[#5C3D2E]/10">
+          <p className="font-[family-name:var(--font-cormorant)] text-lg text-[#3D2519] tracking-widest">
+            EMILY TAL
+          </p>
+          <p className="text-[10px] text-[#5C3D2E]/40 tracking-widest uppercase mt-0.5">ממשק ניהול</p>
+        </div>
+      )}
 
       <nav className="flex-1 overflow-y-auto py-3">
         {tabs.map(({ href, label, icon: Icon }) => {
@@ -86,11 +89,10 @@ export default function AdminSidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
-  const { requestNavigate } = useAdminNav()
+  const { requestNavigate, mobileTitle } = useAdminNav()
 
   useEffect(() => {
     if (!mobileOpen) return
-    // Lock both body and the admin's internal scroll container (<main>)
     const main = document.querySelector<HTMLElement>('main')
     const prevMainOverflow = main?.style.overflowY ?? ''
     document.body.style.overflow = 'hidden'
@@ -122,14 +124,16 @@ export default function AdminSidebar() {
         <NavContent pathname={pathname} onTabClick={handleTabClick} onLogout={handleLogout} />
       </aside>
 
-      {/* Mobile top bar */}
+      {/* Mobile top bar — tab title + hamburger */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-white border-b border-[#5C3D2E]/10 h-12 flex items-center justify-between px-4">
-        <p className="font-[family-name:var(--font-cormorant)] text-base text-[#3D2519] tracking-widest">
-          EMILY TAL
-        </p>
-        <button onClick={() => setMobileOpen(true)} className="text-[#5C3D2E] p-1">
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="text-[#5C3D2E] p-1"
+          aria-label="פתח תפריט"
+        >
           <Menu size={20} />
         </button>
+        <h1 className="text-xs tracking-widest uppercase text-[#3D2519] font-medium">{mobileTitle}</h1>
       </div>
 
       {/* Mobile drawer */}
@@ -137,16 +141,25 @@ export default function AdminSidebar() {
         <div className="fixed inset-0 z-50 md:hidden touch-none">
           <div className="absolute inset-0 bg-black/30" onClick={() => setMobileOpen(false)} />
           <aside className="absolute top-0 right-0 w-64 h-full bg-white shadow-xl flex flex-col touch-auto">
+            {/* Drawer header: logo + "ממשק ניהול" + close button */}
             <div className="flex items-center justify-between px-4 h-12 border-b border-[#5C3D2E]/10">
-              <p className="font-[family-name:var(--font-cormorant)] text-base text-[#3D2519] tracking-widest">
-                EMILY TAL
-              </p>
-              <button onClick={() => setMobileOpen(false)} className="text-[#5C3D2E] p-1">
+              <button onClick={() => setMobileOpen(false)} className="text-[#5C3D2E] p-1" aria-label="סגור תפריט">
                 <X size={18} />
               </button>
+              <div className="flex items-center gap-2">
+                <p className="text-[10px] text-[#5C3D2E]/40 tracking-widest uppercase">ממשק ניהול</p>
+                <p className="font-[family-name:var(--font-cormorant)] text-base text-[#3D2519] tracking-widest">
+                  EMILY TAL
+                </p>
+              </div>
             </div>
             <div className="flex-1 overflow-y-auto">
-              <NavContent pathname={pathname} onTabClick={handleTabClick} onLogout={handleLogout} />
+              <NavContent
+                pathname={pathname}
+                onTabClick={handleTabClick}
+                onLogout={handleLogout}
+                hideLogo
+              />
             </div>
           </aside>
         </div>

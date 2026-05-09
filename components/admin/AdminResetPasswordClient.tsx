@@ -38,8 +38,7 @@ export default function AdminResetPasswordClient() {
       return
     }
 
-    await supabase.auth.signOut()
-    router.push('/adminlogin')
+    router.push('/admin')
   }
 
   return (

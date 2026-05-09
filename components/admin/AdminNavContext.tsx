@@ -1,15 +1,19 @@
 'use client'
 
-import { createContext, useContext, useCallback, useRef, ReactNode } from 'react'
+import { createContext, useContext, useCallback, useRef, useState, ReactNode } from 'react'
 
 interface AdminNavContextValue {
   registerNavigateAway: (fn: ((href: string) => boolean) | null) => void
   requestNavigate: (href: string) => boolean
+  mobileTitle: string
+  setMobileTitle: (title: string) => void
 }
 
 const AdminNavContext = createContext<AdminNavContextValue>({
   registerNavigateAway: () => {},
   requestNavigate: () => true,
+  mobileTitle: '',
+  setMobileTitle: () => {},
 })
 
 export function useAdminNav() {
@@ -18,6 +22,7 @@ export function useAdminNav() {
 
 export function AdminNavProvider({ children }: { children: ReactNode }) {
   const handlerRef = useRef<((href: string) => boolean) | null>(null)
+  const [mobileTitle, setMobileTitle] = useState('')
 
   const registerNavigateAway = useCallback((fn: ((href: string) => boolean) | null) => {
     handlerRef.current = fn
@@ -28,7 +33,7 @@ export function AdminNavProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <AdminNavContext.Provider value={{ registerNavigateAway, requestNavigate }}>
+    <AdminNavContext.Provider value={{ registerNavigateAway, requestNavigate, mobileTitle, setMobileTitle }}>
       {children}
     </AdminNavContext.Provider>
   )

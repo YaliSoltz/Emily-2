@@ -70,7 +70,7 @@ export default async function RootLayout({
         <Script
           src="https://widget.tabnav.com/limited-widget.min.js.gz?req=2_moKYQatPe9KAb17b9WLrdO6vnQnxyE"
           strategy="afterInteractive"
-          {...{ 'tnv-data-config': '{"language":"he","color":"#405ec3","buttonColor":"#405ec3","buttonSize":"small","widgetSize":"small","widgetLocation":"right","buttonLocation":"bottom"}' }}
+          {...{ 'tnv-data-config': JSON.stringify({ language: lang === 'he' ? 'he' : 'en', color: '#405ec3', buttonColor: '#405ec3', buttonSize: 'small', widgetSize: 'small', widgetLocation: lang === 'he' ? 'left' : 'right', buttonLocation: 'bottom' }) }}
         />
         <noscript>
           פתרונות נגישות לאתרי אינטרנט לפי התקן הישראלי 5568{' '}

@@ -106,9 +106,19 @@ export default function Footer({ lang, contactInfo, socialLinks }: FooterProps) 
         </div>
 
         <div className="border-t border-[#F5F0E8]/10 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-[#F5F0E8]/40 tracking-wider">
-            © {new Date().getFullYear()} Emily Tal — {t.rights}
-          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+            <p className="text-xs text-[#F5F0E8]/40 tracking-wider">
+              © {new Date().getFullYear()} Emily Tal — {t.rights}
+            </p>
+            <a
+              href="https://soltz.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-[#F5F0E8]/30 hover:text-[#F5F0E8]/60 tracking-wider transition-colors"
+            >
+              נבנה באהבה על ידי SOLtZ
+            </a>
+          </div>
           <div className="flex items-center gap-4">
             <Link href="/privacy" className="text-xs text-[#F5F0E8]/60 hover:text-[#F5F0E8] tracking-wider transition-colors">
               {t.privacy}

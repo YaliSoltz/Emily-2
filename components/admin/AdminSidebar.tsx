@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import NextImage from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -124,8 +125,9 @@ export default function AdminSidebar() {
         <NavContent pathname={pathname} onTabClick={handleTabClick} onLogout={handleLogout} />
       </aside>
 
-      {/* Mobile top bar — tab title + hamburger */}
+      {/* Mobile top bar — tab title (right/start) + hamburger (left/end) */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-white border-b border-[#5C3D2E]/10 h-12 flex items-center justify-between px-4">
+        <h1 className="text-xs tracking-widest uppercase text-[#3D2519] font-medium">{mobileTitle}</h1>
         <button
           onClick={() => setMobileOpen(true)}
           className="text-[#5C3D2E] p-1"
@@ -133,7 +135,6 @@ export default function AdminSidebar() {
         >
           <Menu size={20} />
         </button>
-        <h1 className="text-xs tracking-widest uppercase text-[#3D2519] font-medium">{mobileTitle}</h1>
       </div>
 
       {/* Mobile drawer */}
@@ -141,17 +142,15 @@ export default function AdminSidebar() {
         <div className="fixed inset-0 z-50 md:hidden touch-none">
           <div className="absolute inset-0 bg-black/30" onClick={() => setMobileOpen(false)} />
           <aside className="absolute top-0 right-0 w-64 h-full bg-white shadow-xl flex flex-col touch-auto">
-            {/* Drawer header: logo + "ממשק ניהול" + close button */}
+            {/* Drawer header: logo (right/start) + X (left/end) */}
             <div className="flex items-center justify-between px-4 h-12 border-b border-[#5C3D2E]/10">
+              <div className="flex items-center gap-2">
+                <NextImage src="/images/logo.svg" alt="Emily Tal" width={100} height={32} className="h-7 w-auto" />
+                <p className="text-[10px] text-[#5C3D2E]/40 tracking-widest uppercase">ממשק ניהול</p>
+              </div>
               <button onClick={() => setMobileOpen(false)} className="text-[#5C3D2E] p-1" aria-label="סגור תפריט">
                 <X size={18} />
               </button>
-              <div className="flex items-center gap-2">
-                <p className="text-[10px] text-[#5C3D2E]/40 tracking-widest uppercase">ממשק ניהול</p>
-                <p className="font-[family-name:var(--font-cormorant)] text-base text-[#3D2519] tracking-widest">
-                  EMILY TAL
-                </p>
-              </div>
             </div>
             <div className="flex-1 overflow-y-auto">
               <NavContent

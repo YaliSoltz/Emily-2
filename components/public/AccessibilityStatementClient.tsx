@@ -1,6 +1,6 @@
 'use client'
 
-import { useLang } from './LangProvider'
+import { useSiteData } from '@/lib/context/SiteDataContext'
 
 const content = {
   he: {
@@ -114,7 +114,7 @@ const content = {
 }
 
 export default function AccessibilityStatementClient() {
-  const { lang } = useLang()
+  const { lang } = useSiteData()
   const t = content[lang]
 
   return (

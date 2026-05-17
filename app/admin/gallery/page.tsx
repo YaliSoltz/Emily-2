@@ -25,6 +25,7 @@ import AdminModal from '@/components/admin/AdminModal'
 import ImageUpload from '@/components/admin/ImageUpload'
 import { AdminField, AdminInput, AdminTextarea } from '@/components/admin/AdminField'
 import { Plus, Pencil, Trash2, GripVertical } from 'lucide-react'
+import { invalidateGallery } from '@/lib/actions'
 import Image from 'next/image'
 
 interface GalleryItem {
@@ -155,6 +156,7 @@ export default function AdminGalleryPage() {
     } else {
       await supabase.from('gallery_items').update(rest).eq('id', id)
     }
+    await invalidateGallery()
     await load()
     setModal(null)
     setSaving(false)
@@ -163,6 +165,7 @@ export default function AdminGalleryPage() {
   const handleDelete = async (id: string) => {
     const supabase = createClient()
     await supabase.from('gallery_items').delete().eq('id', id)
+    await invalidateGallery()
     setItems(prev => prev.filter(i => i.id !== id))
     setDeleteId(null)
   }
@@ -182,6 +185,7 @@ export default function AdminGalleryPage() {
         supabase.from('gallery_items').update({ order_index: item.order_index }).eq('id', item.id)
       )
     )
+    await invalidateGallery()
   }
 
   if (loading) return <div className="p-8 text-sm text-[#5C3D2E]/50">טוען...</div>

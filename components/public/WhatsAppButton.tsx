@@ -1,9 +1,22 @@
 'use client'
 
+import { useSiteData } from '@/lib/context/SiteDataContext'
+
 export default function WhatsAppButton() {
+  const { socialLinks, contactInfo } = useSiteData()
+
+  const waLink = socialLinks.find(l => l.platform === 'whatsapp')
+  const waUrl = waLink?.url ?? (
+    contactInfo?.phone
+      ? `https://wa.me/972${contactInfo.phone.replace(/^0/, '')}`
+      : null
+  )
+
+  if (!waUrl) return null
+
   return (
     <a
-      href="https://wa.me/972524825858"
+      href={waUrl}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="WhatsApp"

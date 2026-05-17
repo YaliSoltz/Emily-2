@@ -1,43 +1,30 @@
 'use client'
 
-import { LangProvider, useLang } from './LangProvider'
+import { useSiteData } from '@/lib/context/SiteDataContext'
 import Header from './Header'
 import Footer from './Footer'
 import WhatsAppButton from './WhatsAppButton'
 import ScrollToTop from './ScrollToTop'
 
-interface Props {
-  children: React.ReactNode
-  contactInfo: { phone: string | null; email: string | null } | null
-  socialLinks: { platform: string; url: string }[]
-  initialLang?: 'he' | 'en'
-}
-
-function ShellInner({ children, contactInfo, socialLinks }: Props) {
-  const { lang, setLang } = useLang()
+function ShellInner({ children }: { children: React.ReactNode }) {
+  const { lang } = useSiteData()
 
   return (
     <>
       <a href="#main-content" className="skip-nav">
         {lang === 'he' ? 'דלג לתוכן הראשי' : 'Skip to main content'}
       </a>
-      <Header lang={lang} onLangChange={setLang} />
+      <Header />
       <main id="main-content" className="flex-1">
         {children}
       </main>
-      <Footer lang={lang} contactInfo={contactInfo} socialLinks={socialLinks} />
+      <Footer />
       <WhatsAppButton />
       <ScrollToTop />
     </>
   )
 }
 
-export default function PublicShell({ children, contactInfo, socialLinks, initialLang }: Props) {
-  return (
-    <LangProvider initialLang={initialLang}>
-      <ShellInner contactInfo={contactInfo} socialLinks={socialLinks}>
-        {children}
-      </ShellInner>
-    </LangProvider>
-  )
+export default function PublicShell({ children }: { children: React.ReactNode }) {
+  return <ShellInner>{children}</ShellInner>
 }

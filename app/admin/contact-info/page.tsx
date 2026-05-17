@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { invalidateContact } from '@/lib/actions'
 import AdminTabLayout from '@/components/admin/AdminTabLayout'
 import { AdminField, AdminInput } from '@/components/admin/AdminField'
 
@@ -40,6 +41,7 @@ export default function AdminContactInfoPage() {
     } else {
       await supabase.from('contact_info').insert({ phone: info.phone, email: info.email, address: info.address })
     }
+    await invalidateContact()
     setSaved(info); setHasChanges(false)
   }
 

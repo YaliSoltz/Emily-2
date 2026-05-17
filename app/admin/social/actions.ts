@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
+import { invalidateContact } from '@/lib/actions'
 import { PLATFORMS } from '@/lib/social-platforms'
 
 export async function saveSocialLinks(
@@ -24,5 +24,5 @@ export async function saveSocialLinks(
     })
   )
 
-  revalidatePath('/', 'layout')
+  await invalidateContact()
 }

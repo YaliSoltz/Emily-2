@@ -2,25 +2,12 @@
 
 import NavLink from './NavLink'
 import Image from 'next/image'
-import { useLang } from './LangProvider'
+import { useSiteData } from '@/lib/context/SiteDataContext'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 
-interface GalleryItem {
-  id: string
-  title: string
-  image_url: string | null
-  category: string | null
-}
-
-interface HomeClientProps {
-  heContent: Record<string, string>
-  enContent: Record<string, string>
-  galleryPreview: GalleryItem[]
-}
-
-export default function HomeClient({ heContent, enContent, galleryPreview }: HomeClientProps) {
-  const { lang } = useLang()
-  const c = lang === 'he' ? heContent : enContent
+export default function HomeClient() {
+  const { lang, homeContent, galleryPreview } = useSiteData()
+  const c = (lang === 'he' ? homeContent.he?.content_json : homeContent.en?.content_json) as Record<string, string> ?? {}
   const isRtl = lang === 'he'
   const ArrowIcon = isRtl ? ArrowLeft : ArrowRight
 

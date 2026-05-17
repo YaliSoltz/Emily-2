@@ -7,6 +7,8 @@ import { useState, useEffect, useRef } from 'react'
 import { Menu, X, ChevronDown } from 'lucide-react'
 import IL from 'country-flag-icons/react/3x2/IL'
 import US from 'country-flag-icons/react/3x2/US'
+import { useSiteData } from '@/lib/context/SiteDataContext'
+import type { Lang } from '@/lib/types'
 
 const navLinks = {
   he: [
@@ -28,12 +30,7 @@ const languages = [
   { code: 'en' as const, label: 'English', Flag: US },
 ]
 
-interface HeaderProps {
-  lang: 'he' | 'en'
-  onLangChange: (lang: 'he' | 'en') => void
-}
-
-function LangDropdown({ lang, onLangChange, onClose, alignLeft }: { lang: 'he' | 'en'; onLangChange: (l: 'he' | 'en') => void; onClose?: () => void; alignLeft?: boolean }) {
+function LangDropdown({ lang, onLangChange, onClose, alignLeft }: { lang: Lang; onLangChange: (l: Lang) => void; onClose?: () => void; alignLeft?: boolean }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const current = languages.find(l => l.code === lang)!
@@ -82,7 +79,8 @@ function LangDropdown({ lang, onLangChange, onClose, alignLeft }: { lang: 'he' |
   )
 }
 
-export default function Header({ lang, onLangChange }: HeaderProps) {
+export default function Header() {
+  const { lang, setLang } = useSiteData()
   const pathname = usePathname()
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -169,7 +167,7 @@ export default function Header({ lang, onLangChange }: HeaderProps) {
                 {link.label}
               </NavLink>
             ))}
-            <LangDropdown lang={lang} onLangChange={onLangChange} />
+            <LangDropdown lang={lang} onLangChange={setLang} />
           </nav>
 
           {/* Mobile hamburger */}
@@ -210,7 +208,7 @@ export default function Header({ lang, onLangChange }: HeaderProps) {
                 </NavLink>
               ))}
               <div className="mt-4">
-                <LangDropdown lang={lang} onLangChange={onLangChange} onClose={() => setMobileOpen(false)} alignLeft />
+                <LangDropdown lang={lang} onLangChange={setLang} onClose={() => setMobileOpen(false)} alignLeft />
               </div>
             </nav>
           </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useLang } from './LangProvider'
+import { useSiteData } from '@/lib/context/SiteDataContext'
 import { Mail, Phone } from 'lucide-react'
 import Link from 'next/link'
 import { SocialIcon, platformLabel } from '@/lib/social-platforms'
@@ -30,23 +30,18 @@ function apiErrorMessage(key: string, lang: 'he' | 'en'): string {
     : 'An error occurred while sending your message. Please try again.')
 }
 
-interface ContactClientProps {
-  heContent: Record<string, string>
-  enContent: Record<string, string>
-  contactInfo: { phone: string | null; email: string | null } | null
-  socialLinks: { platform: string; url: string }[]
-}
+type FormField = 'name' | 'email' | 'phone' | 'message'
 
-export default function ContactClient({ heContent, enContent, contactInfo, socialLinks }: ContactClientProps) {
-  const { lang } = useLang()
-  const c = lang === 'he' ? heContent : enContent
+export default function ContactClient() {
+  const { lang, contactContent, contactInfo, socialLinks } = useSiteData()
+  const c = (lang === 'he' ? contactContent.he?.content_json : contactContent.en?.content_json) as Record<string, string> ?? {}
 
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorKey, setErrorKey] = useState('')
-  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof typeof form, string>>>({})
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FormField, string>>>({})
 
-  const validateField = (field: keyof typeof form, value: string): string => {
+  const validateField = (field: FormField, value: string): string => {
     switch (field) {
       case 'name':
         return value.trim() ? '' : FIELD_ERRORS.required[lang]
@@ -62,23 +57,23 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
     }
   }
 
-  const validateAll = (): Partial<Record<keyof typeof form, string>> => {
-    const errors: Partial<Record<keyof typeof form, string>> = {}
-    for (const key of Object.keys(form) as (keyof typeof form)[]) {
+  const validateAll = (): Partial<Record<FormField, string>> => {
+    const errors: Partial<Record<FormField, string>> = {}
+    for (const key of Object.keys(form) as FormField[]) {
       const err = validateField(key, form[key])
       if (err) errors[key] = err
     }
     return errors
   }
 
-  const handleChange = (field: keyof typeof form, value: string) => {
+  const handleChange = (field: FormField, value: string) => {
     setForm(f => ({ ...f, [field]: value }))
     if (fieldErrors[field]) {
       setFieldErrors(prev => { const next = { ...prev }; delete next[field]; return next })
     }
   }
 
-  const handleBlur = (field: keyof typeof form) => {
+  const handleBlur = (field: FormField) => {
     const err = validateField(field, form[field])
     setFieldErrors(prev => err ? { ...prev, [field]: err } : (({ [field]: _, ...rest }) => rest)(prev))
   }
@@ -114,7 +109,7 @@ export default function ContactClient({ heContent, enContent, contactInfo, socia
     }
   }
 
-  const inputClass = (field: keyof typeof form) =>
+  const inputClass = (field: FormField) =>
     `w-full bg-transparent border-b py-2 text-[#3D2519] focus:outline-none transition-colors placeholder:text-[#5C3D2E]/30 text-sm ${
       fieldErrors[field] ? 'border-red-500' : 'border-[#5C3D2E]/30 focus:border-[#5C3D2E]'
     }`

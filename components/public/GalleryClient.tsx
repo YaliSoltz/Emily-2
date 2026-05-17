@@ -4,17 +4,8 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
-import { useLang } from './LangProvider'
-
-interface GalleryItem {
-  id: string
-  title: string
-  description: string | null
-  image_url: string | null
-  category: string | null
-  language: string
-  order_index: number
-}
+import { useSiteData } from '@/lib/context/SiteDataContext'
+import type { GalleryItem } from '@/lib/types'
 
 const categoryLabels: Record<string, { he: string; en: string }> = {
   textile: { he: 'עיצוב טקסטיל', en: 'Textile Design' },
@@ -69,7 +60,6 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel, rtl }: Ligh
     const dy = e.changedTouches[0].clientY - touchStartY.current
     touchStartX.current = null
     touchStartY.current = null
-    // Ignore if not clearly horizontal or too short
     if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return
     if (dx < 0) next()
     else prev()
@@ -166,12 +156,8 @@ function Lightbox({ item, items, onClose, onNavigate, categoryLabel, rtl }: Ligh
   )
 }
 
-interface GalleryClientProps {
-  items: GalleryItem[]
-}
-
-export default function GalleryClient({ items }: GalleryClientProps) {
-  const { lang } = useLang()
+export default function GalleryClient() {
+  const { lang, galleryItems } = useSiteData()
   const searchParams = useSearchParams()
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [lightboxItem, setLightboxItem] = useState<GalleryItem | null>(null)
@@ -184,14 +170,14 @@ export default function GalleryClient({ items }: GalleryClientProps) {
   useEffect(() => {
     const openId = searchParams.get('open')
     if (openId) {
-      const target = items.find(i => i.id === openId) ?? null
+      const target = galleryItems.find(i => i.id === openId) ?? null
       setLightboxItem(target)
     }
-  }, [searchParams, items])
+  }, [searchParams, galleryItems])
 
   // Deduplicate by id, prefer current lang
   const deduped = Object.values(
-    items.reduce<Record<string, GalleryItem>>((acc, item) => {
+    galleryItems.reduce<Record<string, GalleryItem>>((acc, item) => {
       if (!acc[item.id] || item.language === lang) acc[item.id] = item
       return acc
     }, {})
@@ -276,7 +262,7 @@ export default function GalleryClient({ items }: GalleryClientProps) {
                   {/* Category chip */}
                   <div className="h-6 overflow-hidden">
                     <span className="inline-block bg-[#5C3D2E]/[0.07] text-[#5C3D2E]/65 text-[9px] tracking-[0.18em] uppercase px-2.5 py-[3px] rounded-sm">
-                      {item.category ? categoryLabel(item.category) : '   '}
+                      {item.category ? categoryLabel(item.category) : '   '}
                     </span>
                   </div>
                   {/* Title — 2 lines reserved */}

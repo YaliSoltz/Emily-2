@@ -1,23 +1,18 @@
 'use client'
 
 import Image from 'next/image'
-import { useLang } from './LangProvider'
+import { useSiteData } from '@/lib/context/SiteDataContext'
 
-interface AboutClientProps {
-  heContent: Record<string, unknown>
-  enContent: Record<string, unknown>
-  heImages: Record<string, string>
-}
-
-export default function AboutClient({ heContent, enContent, heImages }: AboutClientProps) {
-  const { lang } = useLang()
-  const c = lang === 'he' ? heContent : enContent
+export default function AboutClient() {
+  const { lang, aboutContent } = useSiteData()
+  const c = (lang === 'he' ? aboutContent.he?.content_json : aboutContent.en?.content_json) as Record<string, unknown> ?? {}
+  const images = (aboutContent.he?.images_json ?? {}) as Record<string, string>
 
   const title = c.title as string
   const bio = c.bio as string
   const disciplinesTitle = c.disciplines_title as string
   const disciplines = c.disciplines as string[] | undefined
-  const profileImage = heImages?.profile_url as string | undefined
+  const profileImage = images.profile_url as string | undefined
 
   return (
     <div className="min-h-screen bg-[#FAF7F2]">

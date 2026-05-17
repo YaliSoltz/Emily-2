@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { invalidatePages } from '@/lib/actions'
 import AdminTabLayout from '@/components/admin/AdminTabLayout'
 import { AdminField, AdminInput, AdminTextarea } from '@/components/admin/AdminField'
 
@@ -51,6 +52,7 @@ export default function AdminHomePage() {
       supabase.from('pages').upsert({ page_name: 'home', language: 'he', content_json: he, images_json: {} }, { onConflict: 'page_name,language' }),
       supabase.from('pages').upsert({ page_name: 'home', language: 'en', content_json: en, images_json: {} }, { onConflict: 'page_name,language' }),
     ])
+    await invalidatePages()
     setSaved({ he, en })
     setHasChanges(false)
   }

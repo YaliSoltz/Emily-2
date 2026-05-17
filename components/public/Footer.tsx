@@ -1,12 +1,9 @@
+'use client'
+
 import { Mail, Phone } from 'lucide-react'
 import Link from 'next/link'
 import { SocialIcon, platformLabel } from '@/lib/social-platforms'
-
-interface FooterProps {
-  lang: 'he' | 'en'
-  contactInfo?: { phone: string | null; email: string | null } | null
-  socialLinks?: { platform: string; url: string }[]
-}
+import { useSiteData } from '@/lib/context/SiteDataContext'
 
 const text = {
   he: {
@@ -35,7 +32,8 @@ const text = {
   },
 }
 
-export default function Footer({ lang, contactInfo, socialLinks }: FooterProps) {
+export default function Footer() {
+  const { lang, contactInfo, socialLinks } = useSiteData()
   const t = text[lang]
 
   return (
@@ -86,7 +84,7 @@ export default function Footer({ lang, contactInfo, socialLinks }: FooterProps) 
                 {contactInfo.phone}
               </a>
             )}
-            {socialLinks && socialLinks.length > 0 && (
+            {socialLinks.length > 0 && (
               <div className="flex gap-3 flex-wrap mt-1">
                 {socialLinks.map(link => (
                   <a

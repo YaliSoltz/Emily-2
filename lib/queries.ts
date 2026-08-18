@@ -1,7 +1,22 @@
 import { unstable_cache } from 'next/cache'
 import { createPublicClient } from './supabase/public'
+import type { Knit } from './types'
 
 const TTL = 3600
+
+/** jsonb columns arrive untyped — keep only non-empty strings so the UI can trust them. */
+function urlList(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  return value.filter((v): v is string => typeof v === 'string' && v.trim() !== '')
+}
+
+function normalizeKnit(row: Record<string, unknown>): Knit {
+  return {
+    ...(row as unknown as Knit),
+    images: urlList(row.images),
+    rotation_frames: urlList(row.rotation_frames),
+  }
+}
 
 export const getPageContent = unstable_cache(
   async (pageName: string) => {
@@ -70,6 +85,7 @@ export const getPublicSiteData = unstable_cache(
       { data: galleryPreviewData },
       { data: contactInfo },
       { data: socialLinks },
+      { data: knitsData },
     ] = await Promise.all([
       supabase.from('pages').select('content_json, images_json').eq('page_name', 'home').eq('language', 'he').single(),
       supabase.from('pages').select('content_json, images_json').eq('page_name', 'home').eq('language', 'en').single(),
@@ -81,6 +97,11 @@ export const getPublicSiteData = unstable_cache(
       supabase.from('gallery_items').select('id, title, image_url, category').order('order_index').limit(6),
       supabase.from('contact_info').select('phone, email').single(),
       supabase.from('social_links').select('platform, url').order('order_index'),
+      supabase
+        .from('knits')
+        .select('id, slug, title_he, title_en, description_he, description_en, alt_he, alt_en, cover_image, images, rotation_frames, model_3d, order_index')
+        .eq('is_published', true)
+        .order('order_index'),
     ])
     return {
       homeContent: { he: heHome, en: enHome },
@@ -90,8 +111,11 @@ export const getPublicSiteData = unstable_cache(
       galleryPreview: galleryPreviewData ?? [],
       contactInfo: contactInfo ?? null,
       socialLinks: socialLinks ?? [],
+      // `?? []` also covers the window before 0004_knits.sql has been run,
+      // where the table does not exist yet and Supabase returns null.
+      knits: (knitsData ?? []).map(normalizeKnit),
     }
   },
   ['public-site-data'],
-  { revalidate: TTL, tags: ['pages', 'gallery', 'contact'] }
+  { revalidate: TTL, tags: ['pages', 'gallery', 'contact', 'knits'] }
 )

@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useAdminNav } from './AdminNavContext'
 import {
   LayoutDashboard, Home, User, Image, Mail, Phone,
-  Share2, HardDrive, Settings, LogOut, X, Menu, ExternalLink
+  Share2, HardDrive, Settings, LogOut, X, Menu, ExternalLink, Shirt
 } from 'lucide-react'
 
 const tabs = [
@@ -16,6 +16,7 @@ const tabs = [
   { href: '/admin/home',         label: 'דף הבית',          icon: Home },
   { href: '/admin/about',        label: 'אודות',            icon: User },
   { href: '/admin/gallery',      label: 'גלריה',            icon: Image },
+  { href: '/admin/knits',        label: 'סריגים',           icon: Shirt },
   { href: '/admin/contact',      label: 'יצירת קשר',        icon: Mail },
   { href: '/admin/messages',     label: 'הודעות',           icon: Mail },
   { href: '/admin/contact-info', label: 'פרטי קשר',        icon: Phone },

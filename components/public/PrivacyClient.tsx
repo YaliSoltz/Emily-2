@@ -45,6 +45,7 @@ const content = {
         list: [
           'Supabase — ספק אחסון הנתונים (מעבד נתונים), הפועל מכוח הסכם עיבוד נתונים תקני',
           'גורמים המוסמכים לכך על פי דין, אם נדרש כך על פי חוק',
+          'Hugging Face — שירות להמרת תמונה למודל תלת-ממדי, שבעלת האתר עשויה להשתמש בו לעיבוד תצלומי העבודות שלה עצמה. שירות זה אינו מקבל שום מידע על מבקרי האתר, ואינו קשור לטופס יצירת הקשר.',
         ],
       },
       {
@@ -118,6 +119,7 @@ const content = {
         list: [
           'Supabase — our data storage provider (data processor), operating under a standard data processing agreement',
           'Entities legally authorised to receive it, where required by applicable law',
+          'Hugging Face — an image-to-3D conversion service the site owner may use to process photographs of her own work. It receives no visitor data of any kind and is unrelated to the contact form.',
         ],
       },
       {

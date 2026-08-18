@@ -31,6 +31,8 @@ const content = {
           'ניגודיות צבעים עומדת בדרישות WCAG 2.2 AA (מינימום 4.5:1 לטקסט רגיל)',
           'אין תנועה או הבהוב ללא אפשרות עצירה',
           'ניווט מקלדת מלא ללא עכבר',
+          'כיבוד העדפת המערכת לצמצום תנועה (prefers-reduced-motion) — סרטון הפתיחה מוחלף בתמונה סטטית',
+          'תצוגת הסיבוב (360°) של הסריגים ניתנת להפעלה במקשי החצים, ולצידה תמיד מוצגת תמונה סטטית של הסריג',
         ],
       },
       {
@@ -85,6 +87,8 @@ const content = {
           'Colour contrast meets WCAG 2.2 AA requirements (minimum 4.5:1 for normal text)',
           'No motion or flashing content without a stop mechanism',
           'Full keyboard navigation without a mouse',
+          'Respects the system reduced-motion preference — the opening video is replaced by a still image',
+          'The 360° knit viewer is operable with the arrow keys, and a static image of the knit is always available alongside it',
         ],
       },
       {

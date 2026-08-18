@@ -13,3 +13,7 @@ export async function invalidateGallery() {
 export async function invalidateContact() {
   updateTag('contact')
 }
+
+export async function invalidateKnits() {
+  updateTag('knits')
+}

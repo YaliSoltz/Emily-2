@@ -19,6 +19,7 @@ export default async function PublicLayout({ children }: { children: React.React
       contactContent={data.contactContent}
       galleryItems={data.galleryItems}
       galleryPreview={data.galleryPreview}
+      knits={data.knits}
     >
       <PublicShell>
         {children}

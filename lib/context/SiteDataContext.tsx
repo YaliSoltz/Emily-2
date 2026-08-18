@@ -8,6 +8,7 @@ import type {
   PageContent,
   GalleryItem,
   GalleryPreviewItem,
+  Knit,
 } from '@/lib/types'
 
 export interface SiteData {
@@ -20,6 +21,7 @@ export interface SiteData {
   contactContent: PageContent
   galleryItems: GalleryItem[]
   galleryPreview: GalleryPreviewItem[]
+  knits: Knit[]
 }
 
 const SiteDataContext = createContext<SiteData | null>(null)
@@ -34,6 +36,7 @@ interface SiteDataProviderProps {
   contactContent: PageContent
   galleryItems: GalleryItem[]
   galleryPreview: GalleryPreviewItem[]
+  knits: Knit[]
 }
 
 export function SiteDataProvider({
@@ -46,6 +49,7 @@ export function SiteDataProvider({
   contactContent,
   galleryItems,
   galleryPreview,
+  knits,
 }: SiteDataProviderProps) {
   const [lang, setLangState] = useState<Lang>(initialLang)
 
@@ -71,6 +75,7 @@ export function SiteDataProvider({
         contactContent,
         galleryItems,
         galleryPreview,
+        knits,
       }}
     >
       {children}

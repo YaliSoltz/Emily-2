@@ -4,6 +4,10 @@ import { Mail, Phone } from 'lucide-react'
 import Link from 'next/link'
 import { SocialIcon, platformLabel } from '@/lib/social-platforms'
 import { useSiteData } from '@/lib/context/SiteDataContext'
+import { navItems, type NavItem } from '@/lib/navigation'
+
+/** Groups have no page of their own — the footer lists their children instead. */
+const flatNav: NavItem[] = navItems.flatMap(item => item.href ? [item] : (item.children ?? []))
 
 const text = {
   he: {
@@ -11,24 +15,12 @@ const text = {
     design: 'עיצוב טקסטיל, סריגה, הדפסי רשת',
     terms: 'תקנון', accessibility: 'נגישות', privacy: 'פרטיות',
     nav: 'ניווט',
-    links: [
-      { href: '/', label: 'בית' },
-      { href: '/about', label: 'אודות' },
-      { href: '/gallery', label: 'גלריה' },
-      { href: '/contact', label: 'יצירת קשר' },
-    ],
   },
   en: {
     rights: 'All rights reserved',
     design: 'Textile Design, Knitting, Screen Printing',
     terms: 'Terms', accessibility: 'Accessibility', privacy: 'Privacy',
     nav: 'Navigation',
-    links: [
-      { href: '/', label: 'Home' },
-      { href: '/about', label: 'About' },
-      { href: '/gallery', label: 'Gallery' },
-      { href: '/contact', label: 'Contact' },
-    ],
   },
 }
 
@@ -53,13 +45,13 @@ export default function Footer() {
           {/* Nav */}
           <div className="flex flex-col gap-3">
             <p className="text-xs tracking-[0.2em] uppercase text-[#F5F0E8]/40 mb-1">{t.nav}</p>
-            {t.links.map(link => (
+            {flatNav.map(link => (
               <Link
                 key={link.href}
-                href={link.href}
+                href={link.href!}
                 className="text-sm text-[#F5F0E8]/70 hover:text-[#F5F0E8] transition-colors"
               >
-                {link.label}
+                {link.label[lang]}
               </Link>
             ))}
           </div>

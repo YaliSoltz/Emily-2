@@ -21,9 +21,17 @@ Fill in `.env.local` with your Supabase credentials:
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Anon/Public key
 - `SUPABASE_SERVICE_ROLE_KEY` — Service Role key (keep secret, server-side only)
 
+Optional:
+- `HF_TOKEN` — a Hugging Face **read** token ([create one](https://huggingface.co/settings/tokens)).
+  Used only by the admin panel's *generate 360°* button. Without it the free
+  ZeroGPU quota is metered anonymously per IP, which allows roughly one
+  generation before a long cooldown. Never exposed to the public bundle — it is
+  released only to a signed-in admin via a server action.
+
 ### 3. Supabase setup
 1. Create a new project at [supabase.com](https://supabase.com)
 2. Go to SQL Editor and run the contents of `supabase/migrations/0001_initial_schema.sql`
+   and then `supabase/migrations/0004_knits.sql`
 3. Go to Storage → Create bucket named `public-images` (set to public)
 4. Go to Authentication → Users → Add User → enter admin email + password
 

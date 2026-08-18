@@ -36,3 +36,29 @@ export interface GalleryPreviewItem {
   image_url: string | null
   category: string | null
 }
+
+/** A single knit. One row per physical piece — bilingual columns, not per-language rows. */
+export interface Knit {
+  id: string
+  slug: string
+  title_he: string
+  title_en: string
+  description_he: string | null
+  description_en: string | null
+  alt_he: string | null
+  alt_en: string | null
+  cover_image: string | null
+  images: string[]
+  rotation_frames: string[]
+  model_3d: string | null
+  order_index: number
+}
+
+/**
+ * The home-page opening visual. `none` keeps the original typographic hero,
+ * so the page is never broken while no asset has been uploaded.
+ */
+export type HeroMedia =
+  | { type: 'none' }
+  | { type: 'image'; src: string; alt: string; focal: string }
+  | { type: 'video'; src: string; poster: string | null; alt: string; focal: string }

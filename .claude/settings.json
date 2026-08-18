@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\yalis\\\\Desktop\\\\projects\\\\emily\" -Recurse -Directory -Depth 2)",
+      "Bash(Select-Object -First 20)",
+      "PowerShell(git add \"app/\\(public\\)/about/page.tsx\" \"app/\\(public\\)/contact/page.tsx\" \"app/\\(public\\)/gallery/page.tsx\" \"app/\\(public\\)/layout.tsx\" \"app/\\(public\\)/page.tsx\" \"app/admin/about/page.tsx\" \"app/admin/contact-info/page.tsx\" \"app/admin/contact/page.tsx\" \"app/admin/gallery/page.tsx\" \"app/admin/home/page.tsx\" \"app/admin/social/actions.ts\" \"components/public/AboutClient.tsx\" \"components/public/AccessibilityStatementClient.tsx\" \"components/public/ContactClient.tsx\" \"components/public/Footer.tsx\" \"components/public/GalleryClient.tsx\" \"components/public/Header.tsx\" \"components/public/HomeClient.tsx\" \"components/public/LangProvider.tsx\" \"components/public/PrivacyClient.tsx\" \"components/public/PublicShell.tsx\" \"components/public/TermsClient.tsx\" \"components/public/WhatsAppButton.tsx\" \"lib/queries.ts\" \"lib/actions.ts\" \"lib/context/\" \"lib/types.ts\")",
+      "PowerShell(git push origin main)"
+    ]
+  }
+}

@@ -9,6 +9,13 @@ import type { Lang } from '@/lib/types'
 const READY_THRESHOLD = 6
 /** Horizontal pixels of drag per frame step. */
 const PX_PER_FRAME = 12
+/**
+ * Frames are captured with the camera orbiting counter-clockwise, so stepping
+ * forward through them spins the object the opposite way to the finger. Moving
+ * backwards makes the knit follow the drag, like turning a real turntable.
+ * This is a physical direction, not a reading direction — it does not flip for RTL.
+ */
+const FRAME_DIRECTION = -1
 
 interface Knit360ViewerProps {
   frames: string[]
@@ -99,7 +106,7 @@ export default function Knit360Viewer({ frames, cover, alt, lang }: Knit360Viewe
   const onPointerMove = (e: React.PointerEvent) => {
     const drag = dragRef.current
     if (!drag) return
-    const frameDelta = Math.round((e.clientX - drag.startX) / PX_PER_FRAME)
+    const frameDelta = Math.round((e.clientX - drag.startX) / PX_PER_FRAME) * FRAME_DIRECTION
     setIndex(((drag.startIndex + frameDelta) % total + total) % total)
   }
 
@@ -112,8 +119,9 @@ export default function Knit360Viewer({ frames, cover, alt, lang }: Knit360Viewe
   }
 
   const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowRight') { e.preventDefault(); step(1) }
-    else if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1) }
+    // Matched to the drag so the arrows spin the knit the same way a swipe does.
+    if (e.key === 'ArrowRight') { e.preventDefault(); step(FRAME_DIRECTION) }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); step(-FRAME_DIRECTION) }
     else if (e.key === 'Home') { e.preventDefault(); setIndex(0); setInteracted(true) }
   }
 

@@ -44,6 +44,7 @@ interface KnitRow {
   images: string[]
   rotation_frames: string[]
   model_3d: string | null
+  use_model_3d: boolean
   order_index: number
   is_published: boolean
 }
@@ -51,7 +52,7 @@ interface KnitRow {
 const empty: KnitRow = {
   id: '', slug: '', title_he: '', title_en: '',
   description_he: '', description_en: '', alt_he: '', alt_en: '',
-  cover_image: '', images: [], rotation_frames: [], model_3d: null,
+  cover_image: '', images: [], rotation_frames: [], model_3d: null, use_model_3d: false,
   order_index: 0, is_published: true,
 }
 
@@ -139,6 +140,8 @@ export default function AdminKnitsPage() {
   const [items, setItems] = useState<KnitRow[]>([])
   const [loading, setLoading] = useState(true)
   const [tableMissing, setTableMissing] = useState(false)
+  // False until 0005_knits_model_viewer.sql has been run — see load().
+  const [supportsModelFlag, setSupportsModelFlag] = useState(false)
   const [modal, setModal] = useState<'add' | 'edit' | null>(null)
   const [editing, setEditing] = useState<KnitRow>(empty)
   const [saving, setSaving] = useState(false)
@@ -153,8 +156,14 @@ export default function AdminKnitsPage() {
 
   const load = useCallback(async () => {
     const supabase = createClient()
-    const { data, error } = await supabase.from('knits').select('*').order('order_index')
+    const [{ data, error }, flagProbe] = await Promise.all([
+      supabase.from('knits').select('*').order('order_index'),
+      // Cheapest way to ask Postgres whether the 0005 column exists. Probing
+      // beats inferring from the rows, which says nothing when the table is empty.
+      supabase.from('knits').select('use_model_3d').limit(1),
+    ])
     if (error) setTableMissing(true)
+    setSupportsModelFlag(!flagProbe.error)
     setItems((data ?? []).map(row => ({
       ...empty,
       ...row,
@@ -193,8 +202,9 @@ export default function AdminKnitsPage() {
     setSaving(true)
     setSaveError('')
     const supabase = createClient()
-    const { id, ...rest } = editing
-    const payload = { ...rest, slug }
+    const { id, use_model_3d, ...rest } = editing
+    // Sending a column Postgres does not have fails the whole write.
+    const payload = supportsModelFlag ? { ...rest, use_model_3d, slug } : { ...rest, slug }
 
     const { error } = modal === 'add'
       ? await supabase.from('knits').insert(payload)
@@ -380,6 +390,31 @@ export default function AdminKnitsPage() {
                   : frameCount < MIN_ROTATION_FRAMES
                     ? `${frameCount} תמונות — מעט מדי לסיבוב חלק. נדרשות לפחות ${MIN_ROTATION_FRAMES}.`
                     : `${frameCount} תמונות — תצוגת הסיבוב תופעל.`}
+              </p>
+            </AdminField>
+
+            <AdminField
+              label="תצוגה תלת-ממדית חיה"
+              hint="מציגה את מודל ה-GLB עצמו במקום רצף התמונות: המבקרת יכולה לסובב לכל כיוון ולהתקרב. הקובץ כבד (מגה-בייטים), ולכן הוא נטען רק אחרי לחיצה על „צפייה תלת-ממדית“ בעמוד הסריג."
+            >
+              <label className="flex items-center gap-2 text-sm text-[#3D2519]">
+                <input
+                  type="checkbox"
+                  checked={editing.use_model_3d}
+                  disabled={!supportsModelFlag || !editing.model_3d}
+                  onChange={e => setEditing(p => ({ ...p, use_model_3d: e.target.checked }))}
+                  className="w-4 h-4 accent-[#5C3D2E] disabled:opacity-40"
+                />
+                הפעלת תצוגה תלת-ממדית לסריג זה
+              </label>
+              <p className="text-[11px] mt-1 text-[#5C3D2E]/50">
+                {!supportsModelFlag
+                  ? 'נדרשת הרצת המיגרציה 0005_knits_model_viewer.sql ב-Supabase כדי להפעיל אפשרות זו.'
+                  : !editing.model_3d
+                    ? 'אין עדיין קובץ מודל לסריג זה. הפעילי „יצירת 360° אוטומטית“ למעלה, והקובץ ייווצר וישמר.'
+                    : editing.use_model_3d
+                      ? 'בעמוד הסריג תוצג התמונה הראשית עם כפתור „צפייה תלת-ממדית“.'
+                      : 'כבוי — בעמוד הסריג יוצג רצף התמונות של 360°.'}
               </p>
             </AdminField>
 

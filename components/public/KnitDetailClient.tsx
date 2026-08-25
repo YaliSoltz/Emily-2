@@ -3,11 +3,12 @@
 import Image from 'next/image'
 import NavLink from './NavLink'
 import Knit360Viewer from './Knit360Viewer'
+import KnitModelViewer from './KnitModelViewer'
 import Lightbox, { type LightboxItem } from './Lightbox'
 import { useState, useEffect } from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useSiteData } from '@/lib/context/SiteDataContext'
-import { knitAlt, knitTitle, knitDescription, hasRotation } from '@/lib/knit'
+import { knitAlt, knitTitle, knitDescription, knitViewerKind } from '@/lib/knit'
 
 export default function KnitDetailClient({ slug }: { slug: string }) {
   const { lang, knits } = useSiteData()
@@ -35,7 +36,7 @@ export default function KnitDetailClient({ slug }: { slug: string }) {
   const title = knitTitle(knit, lang)
   const alt = knitAlt(knit, lang)
   const description = knitDescription(knit, lang)
-  const showRotation = hasRotation(knit)
+  const viewer = knitViewerKind(knit)
 
   const lightboxItems: LightboxItem[] = knit.images.map((src, i) => ({
     id: `${knit.id}-${i}`,
@@ -57,9 +58,16 @@ export default function KnitDetailClient({ slug }: { slug: string }) {
         </NavLink>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-start">
-          {/* Visual — 360° viewer when frames exist, otherwise the static cover */}
+          {/* Visual — live GLB, 360° frames, or the static cover, in that order */}
           <div>
-            {showRotation ? (
+            {viewer === 'model' && knit.model_3d ? (
+              <KnitModelViewer
+                src={knit.model_3d}
+                cover={knit.cover_image}
+                alt={alt}
+                lang={lang}
+              />
+            ) : viewer === 'rotation' ? (
               <Knit360Viewer
                 frames={knit.rotation_frames}
                 cover={knit.cover_image}
@@ -96,7 +104,14 @@ export default function KnitDetailClient({ slug }: { slug: string }) {
                 {description}
               </p>
             )}
-            {showRotation && (
+            {viewer === 'model' && (
+              <p className="mt-8 text-xs tracking-[0.15em] uppercase text-[#5C3D2E]/60">
+                {lang === 'he'
+                  ? 'פתחו את התצוגה התלת-ממדית כדי לסובב ולהתקרב לסריג'
+                  : 'Open the 3D view to orbit and zoom into the knit'}
+              </p>
+            )}
+            {viewer === 'rotation' && (
               <p className="mt-8 text-xs tracking-[0.15em] uppercase text-[#5C3D2E]/60">
                 {lang === 'he'
                   ? 'גררו את התמונה או השתמשו במקשי החצים כדי לסובב'

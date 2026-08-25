@@ -51,6 +51,8 @@ export interface Knit {
   images: string[]
   rotation_frames: string[]
   model_3d: string | null
+  /** Show the live WebGL viewer instead of the frame sequence. Needs model_3d. */
+  use_model_3d: boolean
   order_index: number
 }
 

@@ -33,6 +33,7 @@ const content = {
           'ניווט מקלדת מלא ללא עכבר',
           'כיבוד העדפת המערכת לצמצום תנועה (prefers-reduced-motion) — סרטון הפתיחה מוחלף בתמונה סטטית',
           'תצוגת הסיבוב (360°) של הסריגים ניתנת להפעלה במקשי החצים, ולצידה תמיד מוצגת תמונה סטטית של הסריג',
+          'התצוגה התלת-ממדית החיה נפתחת רק בלחיצה יזומה, ניתנת לסיבוב ולזום במקשי החצים ובמקשי פלוס ומינוס, ונסגרת במקש Escape בחזרה לתמונה הסטטית',
         ],
       },
       {
@@ -89,6 +90,7 @@ const content = {
           'Full keyboard navigation without a mouse',
           'Respects the system reduced-motion preference — the opening video is replaced by a still image',
           'The 360° knit viewer is operable with the arrow keys, and a static image of the knit is always available alongside it',
+          'The live 3D view opens only on an explicit request, orbits and zooms with the arrow keys and the plus and minus keys, and closes back to the static image with Escape',
         ],
       },
       {

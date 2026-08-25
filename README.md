@@ -30,8 +30,8 @@ Optional:
 
 ### 3. Supabase setup
 1. Create a new project at [supabase.com](https://supabase.com)
-2. Go to SQL Editor and run the contents of `supabase/migrations/0001_initial_schema.sql`
-   and then `supabase/migrations/0004_knits.sql`
+2. Go to SQL Editor and run the contents of `supabase/migrations/0001_initial_schema.sql`,
+   then `supabase/migrations/0004_knits.sql`, then `supabase/migrations/0005_knits_model_viewer.sql`
 3. Go to Storage → Create bucket named `public-images` (set to public)
 4. Go to Authentication → Users → Add User → enter admin email + password
 

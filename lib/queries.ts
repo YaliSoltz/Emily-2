@@ -15,7 +15,33 @@ function normalizeKnit(row: Record<string, unknown>): Knit {
     ...(row as unknown as Knit),
     images: urlList(row.images),
     rotation_frames: urlList(row.rotation_frames),
+    // Absent before 0005_knits_model_viewer.sql has been run.
+    use_model_3d: row.use_model_3d === true,
   }
+}
+
+const KNIT_COLUMNS =
+  'id, slug, title_he, title_en, description_he, description_en, alt_he, alt_en, cover_image, images, rotation_frames, model_3d, order_index'
+
+/**
+ * Selecting a column Postgres does not have fails the WHOLE query, which would
+ * empty every knit surface on the site. So `use_model_3d` is asked for
+ * optionally: if 0005 has not been run yet, fall back to the 0004 column list
+ * and let normalizeKnit default the flag to false.
+ */
+async function fetchKnits(
+  supabase: ReturnType<typeof createPublicClient>
+): Promise<Record<string, unknown>[] | null> {
+  // A runtime column list defeats supabase-js's row typing, so the rows come
+  // back opaque and normalizeKnit is what gives them a shape.
+  const query = (columns: string) =>
+    supabase.from('knits').select(columns).eq('is_published', true).order('order_index')
+
+  const withFlag = await query(`${KNIT_COLUMNS}, use_model_3d`)
+  if (!withFlag.error) return withFlag.data as unknown as Record<string, unknown>[] | null
+
+  const legacy = await query(KNIT_COLUMNS)
+  return legacy.data as unknown as Record<string, unknown>[] | null
 }
 
 export const getPageContent = unstable_cache(
@@ -85,7 +111,7 @@ export const getPublicSiteData = unstable_cache(
       { data: galleryPreviewData },
       { data: contactInfo },
       { data: socialLinks },
-      { data: knitsData },
+      knitsData,
     ] = await Promise.all([
       supabase.from('pages').select('content_json, images_json').eq('page_name', 'home').eq('language', 'he').single(),
       supabase.from('pages').select('content_json, images_json').eq('page_name', 'home').eq('language', 'en').single(),
@@ -97,11 +123,7 @@ export const getPublicSiteData = unstable_cache(
       supabase.from('gallery_items').select('id, title, image_url, category').order('order_index').limit(6),
       supabase.from('contact_info').select('phone, email').single(),
       supabase.from('social_links').select('platform, url').order('order_index'),
-      supabase
-        .from('knits')
-        .select('id, slug, title_he, title_en, description_he, description_en, alt_he, alt_en, cover_image, images, rotation_frames, model_3d, order_index')
-        .eq('is_published', true)
-        .order('order_index'),
+      fetchKnits(supabase),
     ])
     return {
       homeContent: { he: heHome, en: enHome },

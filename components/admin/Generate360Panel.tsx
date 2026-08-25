@@ -31,6 +31,8 @@ export default function Generate360Panel({ coverImage, slug, onComplete }: Gener
   const [detail, setDetail] = useState('')
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
   const [error, setError] = useState('')
+  /** The Space's own untranslated message, shown under the Hebrew summary. */
+  const [errorDetail, setErrorDetail] = useState('')
   const abortRef = useRef<AbortController | null>(null)
 
   useEffect(() => () => abortRef.current?.abort(), [])
@@ -49,6 +51,7 @@ export default function Generate360Panel({ coverImage, slug, onComplete }: Gener
     abortRef.current = controller
     setRunning(true)
     setError('')
+    setErrorDetail('')
     setProgress(null)
 
     try {
@@ -99,6 +102,9 @@ export default function Generate360Panel({ coverImage, slug, onComplete }: Gener
             ? err.message
             : 'אירעה שגיאה לא צפויה'
       )
+      // Without this the Hebrew summary is all anyone ever sees, and a
+      // misclassified failure is impossible to tell from a real one.
+      setErrorDetail(err instanceof TrellisError ? err.detail ?? '' : '')
       setStatus('')
       setDetail('')
       setProgress(null)
@@ -131,7 +137,14 @@ export default function Generate360Panel({ coverImage, slug, onComplete }: Gener
       </div>
 
       {error && (
-        <p className="text-xs text-red-600 leading-relaxed" role="alert">{error}</p>
+        <div role="alert">
+          <p className="text-xs text-red-600 leading-relaxed">{error}</p>
+          {errorDetail && (
+            <p className="text-[11px] text-[#5C3D2E]/50 mt-1 font-mono break-all" dir="ltr">
+              {errorDetail}
+            </p>
+          )}
+        </div>
       )}
 
       {running ? (

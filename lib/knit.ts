@@ -22,3 +22,20 @@ export function knitAlt(knit: Knit, lang: Lang): string {
 export function hasRotation(knit: Knit): boolean {
   return knit.rotation_frames.length >= MIN_ROTATION_FRAMES
 }
+
+/**
+ * Live WebGL viewer, opted in per knit. The GLB is raw TRELLIS output and weighs
+ * several megabytes, so this never loads until the visitor asks for it.
+ */
+export function hasLiveModel(knit: Knit): boolean {
+  return knit.use_model_3d === true && !!knit.model_3d
+}
+
+/** What the detail page shows for the main visual — decided in one place. */
+export type KnitViewerKind = 'model' | 'rotation' | 'static'
+
+export function knitViewerKind(knit: Knit): KnitViewerKind {
+  if (hasLiveModel(knit)) return 'model'
+  if (hasRotation(knit)) return 'rotation'
+  return 'static'
+}

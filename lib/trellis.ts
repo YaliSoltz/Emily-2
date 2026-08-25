@@ -70,12 +70,22 @@ const DEFAULTS = {
   tex_slat_guidance_rescale: 0.0,
   tex_slat_sampling_steps: 12,
   tex_slat_rescale_t: 3.0,
-  decimation_target: 300000,
-  texture_size: 2048,
+  // Deliberately far below the Space's own defaults (300k triangles, 2048px).
+  // Those produce a ~16MB GLB, which is a lot to hand a phone for a knit shown
+  // at ~560px. At 50k triangles and a 1024px texture the silhouette and the
+  // weave still read at full zoom, and the file lands near a tenth of the size.
+  // Raise these only for a piece whose surface genuinely needs the detail.
+  decimation_target: 50000,
+  texture_size: 1024,
 }
 
 export class TrellisError extends Error {
-  constructor(message: string, readonly kind: 'quota' | 'unavailable' | 'failed') {
+  constructor(
+    message: string,
+    readonly kind: 'quota' | 'timeout' | 'unavailable' | 'noToken' | 'failed',
+    /** The untranslated message from the Space, kept for diagnosis. */
+    readonly detail?: string
+  ) {
     super(message)
     this.name = 'TrellisError'
   }
@@ -94,20 +104,53 @@ function fileUrl(file: unknown): string | null {
   return null
 }
 
+/**
+ * Turns a Space error into something Emily can act on.
+ *
+ * The categories are deliberately narrow. An earlier version folded
+ * "GPU task aborted" into the quota bucket, which made every GPU-side failure
+ * — including a step simply running past its 120-second budget — report itself
+ * as an exhausted quota. That sent the wrong person looking in the wrong place,
+ * so every branch now keeps the original message in `detail`.
+ */
 function classify(error: unknown): TrellisError {
   const message = error instanceof Error ? error.message : String(error)
   const lower = message.toLowerCase()
 
-  if (lower.includes('quota') || lower.includes('gpu task aborted') || lower.includes('exceeded')) {
+  // Always keep the untranslated text around — the Hebrew below is a summary,
+  // not a substitute.
+  if (typeof console !== 'undefined') console.error('[trellis]', error)
+
+  // ZeroGPU says so explicitly when the budget is the problem, and usually
+  // names the wait. Anything vaguer is not a quota error.
+  if (lower.includes('quota') || lower.includes('exceeded your') || lower.includes('gpu quota')) {
+    // ZeroGPU names the exact wait — it is the single most useful part of the
+    // message, so it goes in the summary rather than only in the detail line.
+    const wait = /try again in ([0-9:]+)/i.exec(message)?.[1]
     return new TrellisError(
-      'מכסת ה-GPU החינמית של Hugging Face נוצלה. המכסה מתמלאת לאט מאוד — נסי שוב בעוד כשעה, או חברי חשבון Hugging Face להגדלת המכסה.',
-      'quota'
+      `מכסת ה-GPU החינמית של Hugging Face נוצלה${wait ? ` — אפשר לנסות שוב בעוד ${wait} (שעות:דקות:שניות)` : ''}. ` +
+        `כל הרצה דורשת כ-${GPU_SECONDS_PER_RUN} שניות GPU פנויות, ולכן היא נחסמת גם כשנותרה מכסה חלקית. ` +
+        'חשבון PRO בתשלום מקבל 25 דקות ליום.',
+      'quota',
+      message
     )
   }
-  if (lower.includes('sleeping') || lower.includes('not running') || lower.includes('build') || lower.includes('503')) {
-    return new TrellisError('ה-Space של TRELLIS אינו זמין כרגע (ייתכן שהוא במצב שינה או בתחזוקה). נסי שוב מאוחר יותר.', 'unavailable')
+
+  // The Space declares @spaces.GPU(duration=120) per step. A heavier photo can
+  // run past that and be killed, which reads as an abort, not as a quota.
+  if (lower.includes('aborted') || lower.includes('timeout') || lower.includes('timed out')) {
+    return new TrellisError(
+      'משימת ה-GPU נעצרה באמצע — לרוב מפני שהשלב ארך יותר מהזמן המוקצב לו (שתי דקות). נסי תמונה קטנה או פשוטה יותר, או הורידי את הרזולוציה ל-512.',
+      'timeout',
+      message
+    )
   }
-  return new TrellisError(`יצירת המודל נכשלה: ${message}`, 'failed')
+
+  if (lower.includes('sleeping') || lower.includes('not running') || lower.includes('build') || lower.includes('503')) {
+    return new TrellisError('ה-Space של TRELLIS אינו זמין כרגע (ייתכן שהוא במצב שינה או בתחזוקה). נסי שוב מאוחר יותר.', 'unavailable', message)
+  }
+
+  return new TrellisError(`יצירת המודל נכשלה: ${message}`, 'failed', message)
 }
 
 /**
@@ -125,6 +168,16 @@ export async function imageToGlb(image: Blob, options: TrellisOptions = {}): Pro
     signal,
   } = options
 
+  // Without a token the run is metered against this browser's IP address on
+  // ZeroGPU's small anonymous budget, which is shared and usually already
+  // spent. Failing here beats burning a run and blaming the quota afterwards.
+  if (!token) {
+    throw new TrellisError(
+      'לא נמצא מפתח Hugging Face. בלעדיו ההרצה נספרת על כתובת ה-IP במכסה ציבורית זעירה וכמעט תמיד נכשלת. ודאי ש-HF_TOKEN מוגדר בסביבה ושאת מחוברת לפאנל הניהול.',
+      'noToken'
+    )
+  }
+
   // Loaded on demand so the Gradio client never lands in the initial admin bundle.
   const { Client } = await import('@gradio/client')
 
@@ -133,7 +186,7 @@ export async function imageToGlb(image: Blob, options: TrellisOptions = {}): Pro
 
   let client: Awaited<ReturnType<typeof Client.connect>>
   try {
-    client = await Client.connect(SPACE_ID, token ? { token: token as `hf_${string}` } : undefined)
+    client = await Client.connect(SPACE_ID, { token: token as `hf_${string}` })
   } catch (error) {
     throw classify(error)
   }

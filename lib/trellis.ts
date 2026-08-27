@@ -27,6 +27,15 @@ const SPACE_ID = 'microsoft/TRELLIS.2'
 /** Both GPU steps are declared @spaces.GPU(duration=120) on the Space. */
 export const GPU_SECONDS_PER_RUN = 240
 
+/**
+ * How many times /extract_glb may be tried before the run is written off.
+ *
+ * Each attempt is its own 120s GPU reservation, so this stays low. Two is the
+ * useful number: it survives a transient failure without quietly doubling the
+ * cost of a run that was never going to work.
+ */
+const EXTRACT_ATTEMPTS = 2
+
 export type TrellisResolution = '512' | '1024' | '1536'
 
 export interface TrellisOptions {
@@ -70,14 +79,34 @@ const DEFAULTS = {
   tex_slat_guidance_rescale: 0.0,
   tex_slat_sampling_steps: 12,
   tex_slat_rescale_t: 3.0,
-  // Deliberately far below the Space's own defaults (300k triangles, 2048px).
-  // Those produce a ~16MB GLB, which is a lot to hand a phone for a knit shown
-  // at ~560px. At 50k triangles and a 1024px texture the silhouette and the
-  // weave still read at full zoom, and the file lands near a tenth of the size.
-  // Raise these only for a piece whose surface genuinely needs the detail.
-  decimation_target: 50000,
-  texture_size: 1024,
+  // Measured on a real run: of a 16MB GLB, geometry was 14.7MB and the two
+  // WebP textures together were 0.93MB. So the size problem is entirely
+  // triangles, and decimation_target drops to the floor the Space allows —
+  // 100k is still finer than one triangle per pixel at the size a knit is
+  // shown, while cutting the file by roughly two thirds.
+  //
+  // texture_size deliberately stays at the Space's default. It is what carries
+  // the weave, which is the point of a textile portfolio, and the viewer allows
+  // 2x zoom. Halving it would save ~0.6MB and blur the fabric.
+  decimation_target: 100000,
+  texture_size: 2048,
 }
+
+/**
+ * The Space's slider bounds, copied from its app.py:
+ *
+ *   decimation_target = gr.Slider(100000, 500000, value=300000, step=10000)
+ *   texture_size      = gr.Slider(1024,   4096,  value=2048,   step=1024)
+ *
+ * Gradio validates these server-side, but only when /extract_glb is called —
+ * which is after /image_to_3d has already spent its GPU time. An out-of-range
+ * number therefore costs a whole generation to discover, so it is checked here
+ * before anything is sent.
+ */
+const BOUNDS = {
+  decimationTarget: { min: 100000, max: 500000 },
+  textureSize: { min: 1024, max: 4096 },
+} as const
 
 export class TrellisError extends Error {
   constructor(
@@ -168,6 +197,21 @@ export async function imageToGlb(image: Blob, options: TrellisOptions = {}): Pro
     signal,
   } = options
 
+  if (decimationTarget < BOUNDS.decimationTarget.min || decimationTarget > BOUNDS.decimationTarget.max) {
+    throw new TrellisError(
+      `ערך decimation_target חייב להיות בין ${BOUNDS.decimationTarget.min} ל-${BOUNDS.decimationTarget.max}.`,
+      'failed',
+      `decimation_target out of range: ${decimationTarget}`
+    )
+  }
+  if (textureSize < BOUNDS.textureSize.min || textureSize > BOUNDS.textureSize.max) {
+    throw new TrellisError(
+      `ערך texture_size חייב להיות בין ${BOUNDS.textureSize.min} ל-${BOUNDS.textureSize.max}.`,
+      'failed',
+      `texture_size out of range: ${textureSize}`
+    )
+  }
+
   // Without a token the run is metered against this browser's IP address on
   // ZeroGPU's small anonymous budget, which is shared and usually already
   // spent. Failing here beats burning a run and blaming the quota afterwards.
@@ -223,12 +267,50 @@ export async function imageToGlb(image: Blob, options: TrellisOptions = {}): Pro
     })
     throwIfAborted(signal)
 
-    // Reads the mesh out of the session state left by the previous call.
+    // Reads the latents out of the session state left by the previous call.
+    //
+    // Worth retrying rather than failing the whole run: by this point the
+    // expensive half is already paid for, and the latents are sitting in this
+    // session. Re-running /extract_glb costs one more GPU reservation; letting
+    // the error escape costs the generation as well, because the state dies
+    // with the client and cannot be reached again from a new connection.
     onProgress?.('extracting', 'שלב 2 מתוך 2 — מחלץ את הקובץ')
-    const extracted = await client.predict('/extract_glb', {
-      decimation_target: decimationTarget,
-      texture_size: textureSize,
-    })
+
+    let extracted: Awaited<ReturnType<typeof client.predict>> | null = null
+    let extractError: unknown = null
+    for (let attempt = 1; attempt <= EXTRACT_ATTEMPTS; attempt++) {
+      try {
+        extracted = await client.predict('/extract_glb', {
+          decimation_target: decimationTarget,
+          texture_size: textureSize,
+        })
+        extractError = null
+        break
+      } catch (error) {
+        extractError = error
+        throwIfAborted(signal)
+
+        // A missing budget or a killed task will not behave differently on a
+        // second try, and each attempt spends real quota. Only transient
+        // failures are worth repeating.
+        const kind = classify(error).kind
+        if (kind === 'quota' || kind === 'timeout' || attempt === EXTRACT_ATTEMPTS) break
+
+        onProgress?.('extracting', `שלב 2 מתוך 2 — ניסיון ${attempt + 1} מתוך ${EXTRACT_ATTEMPTS}`)
+        await new Promise(resolve => setTimeout(resolve, 1500))
+      }
+    }
+
+    if (extractError || !extracted) {
+      const inner = classify(extractError)
+      throw new TrellisError(
+        `המודל נבנה בהצלחה, אבל חילוץ הקובץ נכשל — ולכן ההרצה כולה אבודה. ` +
+          `המודל נשמר רק בזיכרון הזמני של ה-Space ואי אפשר לחזור אליו מאוחר יותר, ` +
+          `גם לא אחרי שהמכסה תתחדש. ${inner.message}`,
+        inner.kind,
+        inner.detail
+      )
+    }
     throwIfAborted(signal)
 
     const glbUrl = fileUrl((extracted.data as unknown[])?.[0])
